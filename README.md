@@ -48,6 +48,19 @@ Optionally copy `.env.example` to `.env` — the defaults work out of the box.
 | `pnpm test:e2e:report` | Open the last HTML report |
 | `pnpm check` | lint + typecheck + unit + build |
 
+## Gameplay configuration
+
+All balancing numbers live in [`src/game/config/gameConfig.ts`](src/game/config/gameConfig.ts).
+The Options screen exposes two of them:
+
+| Option | Default | Limits |
+|---|---|---|
+| Game session time | 120 s | 60–180 s |
+| Enemy spawn time | 3 s | 1–10 s |
+
+Below 1 s the arena fills up to the alive-enemy cap within seconds; above 10 s a short match may
+not show both enemy types. Each match uses a snapshot of the options taken when it starts.
+
 ## Environment variables
 
 | Variable | Default | Purpose |
