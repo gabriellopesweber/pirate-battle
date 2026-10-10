@@ -63,9 +63,22 @@ export interface SpawnConfig {
   clearance: number
 }
 
+/** A rectangle measured in tiles. An island is one or more of these. */
+export interface TileRect {
+  col: number
+  row: number
+  cols: number
+  rows: number
+}
+
 export interface ArenaConfig {
-  width: number
-  height: number
+  tileSize: number
+  cols: number
+  rows: number
+  /** Each island is a union of tile rectangles; land blocks ships and projectiles. */
+  islands: TileRect[][]
+  /** Where the player starts, in world units. Must be water, away from islands. */
+  playerSpawn: { x: number; y: number }
 }
 
 export interface SimulationConfig {
@@ -87,8 +100,26 @@ export interface GameConfig {
 
 export const DEFAULT_GAME_CONFIG: GameConfig = {
   match: { durationSeconds: 120 },
-  // 25 × 14 tiles of 64 units — a 16:9-ish world the renderer letterboxes.
-  arena: { width: 1600, height: 896 },
+  // 25 × 14 tiles of 64 units (1600 × 896) — a 16:9-ish world the renderer
+  // letterboxes. Islands leave the centre open for the player's start.
+  arena: {
+    tileSize: 64,
+    cols: 25,
+    rows: 14,
+    islands: [
+      [
+        { col: 3, row: 2, cols: 4, rows: 2 },
+        { col: 3, row: 4, cols: 2, rows: 2 },
+      ],
+      [{ col: 18, row: 2, cols: 2, rows: 2 }],
+      [{ col: 6, row: 10, cols: 2, rows: 2 }],
+      [
+        { col: 16, row: 10, cols: 5, rows: 2 },
+        { col: 19, row: 8, cols: 2, rows: 2 },
+      ],
+    ],
+    playerSpawn: { x: 800, y: 448 },
+  },
   simulation: { stepSeconds: 1 / 60, maxStepsPerFrame: 5 },
   spawn: {
     intervalSeconds: 3,
