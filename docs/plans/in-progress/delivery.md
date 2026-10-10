@@ -45,8 +45,10 @@ Priority is **consequence, not effort** — "what happens to the evaluation if t
   island collision against a tile-grid land mask with sliding along coasts; speed drops only on a
   stall. Movement is shared with enemies through `ShipControls`. Arena layout moved into
   `GameConfig.arena` (tiles, islands, player spawn) · **#5**
-- [ ] **Weapons and projectiles** — front shot, left/right broadside (3 parallel), per-weapon
-  cooldown, speed, damage applied once, lifetime/range, removal on hit/obstacle/exit · **#6**
+- [x] **Weapons and projectiles** — front shot, port and starboard broadsides (3 parallel) with
+  independent cooldowns; damage applied once and the projectile removed in the same step; removal
+  on land, at the arena edge and on expiry; no friendly fire. Added a per-step `GameEvent` list
+  (shot, hit, splash, destroyed) as the single channel to rendering, sound and scoring · **#6**
 - [ ] **Enemies and spawner** — Chaser (pursue, ram, explode, no score), Shooter (approach, fire in
   range), both colliding with islands; spawn interval, distribution, safe spawn points · **#7**
 - [ ] **Match rules** — timer (60–180 s), score, end by time or death, everything stops at the end,
