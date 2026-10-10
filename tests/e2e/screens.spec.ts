@@ -94,6 +94,9 @@ test('the menu fits a small laptop screen without scrolling', async ({ page, isM
   await openMenu(page)
 
   const panel = page.locator('.screen')
-  const overflow = await panel.evaluate((element) => element.scrollHeight - element.clientHeight)
-  expect(overflow).toBeLessThanOrEqual(0)
+  const room = await panel.evaluate((element) => element.clientHeight - element.scrollHeight)
+  expect(room).toBeGreaterThanOrEqual(0)
+  // Fonts differ between platforms; keep a margin rather than fitting exactly.
+  const slack = await panel.evaluate((element) => window.innerHeight - element.getBoundingClientRect().height)
+  expect(slack).toBeGreaterThanOrEqual(20)
 })

@@ -158,3 +158,23 @@
   scrollbar-width: thin;
   scrollbar-color: rgb(244 234 213 / 0.4) transparent;
 }
+
+/*
+ * Short screens (small laptops, landscape phones): drop the decorative
+ * tagline and tighten spacing so the menu keeps clear of scrolling with any
+ * system font — font metrics differ between platforms by several pixels.
+ */
+@media (max-height: 660px) {
+  .screen__tagline {
+    display: none;
+  }
+
+  .screen__section {
+    margin: 0.25rem 0;
+  }
+
+  .button-stack {
+    gap: 0.3rem;
+    margin: 0.35rem 0;
+  }
+}
