@@ -10,8 +10,6 @@ export interface Enemy extends Ship {
   readonly kind: EnemyKind
   /** Only the Shooter fires; the Chaser's cooldown is never used. */
   readonly weapon: Cooldown
-  /** A committed turn away from land, held for `seconds` before steering is re-evaluated. */
-  readonly detour: { turn: -1 | 1; seconds: number }
 }
 
 export function createEnemy(
@@ -26,6 +24,5 @@ export function createEnemy(
     ...createShip(id, kind, stats, position, heading),
     kind,
     weapon: readyCooldown(),
-    detour: { turn: 1, seconds: 0 },
   }
 }

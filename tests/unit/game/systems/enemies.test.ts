@@ -3,6 +3,7 @@ import { DEFAULT_GAME_CONFIG, type GameConfig } from '@/game/config/gameConfig'
 import { angleTo, distance, type Vec2 } from '@/game/core/vector'
 import { createEnemy, type EnemyKind } from '@/game/entities/enemy'
 import { destroyShip } from '@/game/systems/combat'
+import { hasLineOfSight, waypoint } from '@/game/systems/enemyAi'
 import { circleHitsLand } from '@/game/world/arena'
 import type { GameEvent } from '@/game/world/events'
 import { IDLE_PLAYER_INPUT, type World } from '@/game/world/state'
@@ -59,9 +60,9 @@ describe('Chaser', () => {
 
   it('never sails into an island while chasing across it', () => {
     const world = createWorld(testConfig(), 1)
-    // Player north of the top-left island, Chaser south of it.
-    world.player.position = { x: 320, y: 60 }
-    const chaser = place(world, 'chaser', { x: 300, y: 560 })
+    // Player north of the 3 × 3 island (x 192-384, y 128-320), Chaser south of it.
+    world.player.position = { x: 288, y: 60 }
+    const chaser = place(world, 'chaser', { x: 288, y: 440 })
     const start = distance(chaser.position, world.player.position)
     let closest = start
 
@@ -72,6 +73,44 @@ describe('Chaser', () => {
     })
 
     expect(closest).toBeLessThan(start / 2)
+  })
+})
+
+describe('waypoint', () => {
+  // The 3 × 3 island spans x 192-384, y 128-320.
+  it('heads straight for the player when nothing is in the way', () => {
+    const world = createWorld(testConfig(), 1)
+    const chaser = place(world, 'chaser', { x: 600, y: 600 })
+
+    expect(waypoint(world.arena, chaser, world.player.position)).toEqual(world.player.position)
+  })
+
+  it('heads for a reachable corner of the island in the way', () => {
+    const world = createWorld(testConfig(), 1)
+    const chaser = place(world, 'chaser', { x: 288, y: 440 })
+    const goal = { x: 288, y: 60 }
+
+    const corner = waypoint(world.arena, chaser, goal)
+
+    // Straight below the island with the goal straight above it, no corner
+    // the ship can see also sees the goal: it takes a near corner first, and
+    // re-picking every step chains it to the far one.
+    const island = world.arena.islands[0]
+    const margin = chaser.radius + 20
+    expect([(island?.left ?? 0) - margin, (island?.right ?? 0) + margin]).toContain(corner.x)
+    expect(corner.y).toBe((island?.bottom ?? 0) + margin)
+    expect(hasLineOfSight(world.arena, chaser.position, corner, chaser.radius)).toBe(true)
+  })
+
+  it('takes the corner that sees the goal once one is in view', () => {
+    const world = createWorld(testConfig(), 1)
+    // At the island's bottom-left corner, the top-left corner is in view and sees the goal.
+    const chaser = place(world, 'chaser', { x: 150, y: 362 })
+    const goal = { x: 288, y: 60 }
+
+    const corner = waypoint(world.arena, chaser, goal)
+
+    expect(hasLineOfSight(world.arena, corner, goal, chaser.radius)).toBe(true)
   })
 })
 
