@@ -1,0 +1,24 @@
+.controls-legend {
+  display: grid;
+  gap: 0.15rem;
+  margin: 0;
+  font-size: 0.8rem;
+}
+
+.controls-legend__row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.controls-legend dt {
+  min-width: 4.5rem;
+}
+
+.controls-legend dd {
+  margin: 0;
+}
+
+.controls-legend kbd {
+  font-family: inherit;
+  font-weight: 600;
+}
