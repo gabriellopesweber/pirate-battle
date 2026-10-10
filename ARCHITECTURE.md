@@ -314,9 +314,41 @@ Once an attempt settles, late progress events are ignored. Without that, files s
 after another one failed kept reporting progress and flipped the error back to "loading", hiding
 Retry — caught by the E2E test that aborts the ships image.
 
+## Screens
+
+`App` (`src/app/App.tsx`) is a small state machine — menu ⇄ options, menu → game → result →
+game | menu — with no router: there is nothing to deep-link to, and a refresh during combat must
+end the match anyway. The asset gate sits in front of every screen, because the menus are drawn
+from the same UI atlas as the game.
+
+- **Visual identity** comes from the provided UI atlas, following the reference images in the
+  brief's repository. CSS needs some frames as images of their own (9-slicing the menu panel with
+  `border-image`, button states), so `frameImage` cuts a frame out of the atlas image Pixi already
+  decoded into a `data:` URL, once per frame. Other sprites are CSS backgrounds on the atlas image.
+- **Options** keeps each field as typed text, validates on change, explains invalid values inline
+  (`aria-invalid` + described error), and disables Save while anything is invalid.
+- **Pause dialog** offers Resume, Restart and Main Menu, and focuses Resume. The reference image
+  also shows Options there; it is left out — the brief does not ask for it, and opening Options
+  from combat would mean leaving the match.
+- **Leaving combat** (Main Menu, or a refresh) unmounts the game view, which destroys the session:
+  the match is abandoned.
+
 ## Local persistence
 
-_Written with Options and match registration._
+`src/storage/` wraps Web Storage so it never throws — storage can be missing, full or blocked, and
+the game then keeps working without persistence — and validates every value read, so an old or
+hand-edited entry falls back instead of crashing.
+
+| Key | Storage | Holds |
+|---|---|---|
+| `pirate-battle:options` | localStorage | the two saved options; invalid → defaults |
+| `pirate-battle:last-result` | localStorage | the last completed match's score, duration, end reason, date |
+| `pirate-battle:screen` | sessionStorage | `"result"` while the result screen is shown |
+
+On load, the app shows the result screen only if the session marker and a valid last result both
+exist; otherwise the menu. So a refresh on the result screen shows it again, and a refresh during
+combat lands on the menu — the match is gone, as the brief requires. Each match takes its config
+snapshot from the options saved when Play is pressed.
 
 ## Ranking and history integration
 

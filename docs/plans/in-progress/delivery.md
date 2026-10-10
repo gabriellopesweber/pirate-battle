@@ -70,9 +70,14 @@ Priority is **consequence, not effort** — "what happens to the evaluation if t
   (unbound and reset on pause/end), touch buttons from the atlas sprites with per-button pointer
   capture, controls legend from the same bindings. Added at his request: `R` and a Restart button,
   each starting a fresh session (the brief's "restart creates a new match") · **#10**
-- [ ] **React screens** — main menu (Play, Options, controls, tabs), Options with validation and
-  persistence, game screen with HUD and pause dialog, result screen with last result persisted ·
-  **#11**
+- [x] **React screens** — screen state machine; menu (title art, Play, Options, controls, Ranking
+  and Match History tabs — content in #12), Options (inline validation, Save disabled while
+  invalid, saved to localStorage), HUD from the atlas (health bar clipped as its metadata says,
+  score and time counters, pause and restart), pause dialog, result screen restored after a
+  refresh; refresh during combat abandons the match. Visual identity follows the brief's reference
+  images, built from the UI atlas (`frameImage` cuts frames for CSS). Divergence: the pause dialog
+  has no Options button (not required; it would leave combat). The game → result transition is
+  E2E-tested once the test clock lands (#15) · **#11**
 
 ## 🟡 Wave 2 — what the evaluator will poke at
 
