@@ -5,7 +5,7 @@
 > Scope: everything the brief scores. What gets cut is written down below, never dropped silently.
 
 > **Status: 🚧 in progress.** Epic **#1** with 19 sub-issues (#2–#20). Project scaffold and CI
-> workflow in place; Vercel deploy pending (#2).
+> workflow in place; deployed to Vercel (#2 ✅).
 
 ## Legend
 
@@ -28,8 +28,10 @@ Priority is **consequence, not effort** — "what happens to the evaluation if t
 
 ## 🔴 Wave 1 — playable, deployed, and honest about its rules
 
-- [ ] **Tooling, CI and deploy** — lint/typecheck/unit/build/E2E in GitHub Actions; Vercel
-  deploy from `main`, previews on PRs. Deploy first, not last · **#2**
+- [x] **Tooling, CI and deploy** — lint/typecheck/unit/build/E2E in GitHub Actions; Vercel Git
+  integration (production from `main`, previews on PRs — previews sit behind Vercel's login, so
+  production is the only public URL). Live at https://gabriellopesweber-pirate-battle.vercel.app.
+  Smoke E2E guards render and SPA fallback · **#2** (PR #21)
 - [ ] **Asset pipeline** — copy the provided assets, convert the ships XML atlas to Pixi JSON,
   load with visible progress, failure state and retry before combat starts · **#3**
 - [ ] **Gameplay config and simulation core** — typed, centralised config; fixed-timestep loop;
