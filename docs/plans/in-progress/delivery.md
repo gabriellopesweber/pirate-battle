@@ -49,8 +49,11 @@ Priority is **consequence, not effort** — "what happens to the evaluation if t
   independent cooldowns; damage applied once and the projectile removed in the same step; removal
   on land, at the arena edge and on expiry; no friendly fire. Added a per-step `GameEvent` list
   (shot, hit, splash, destroyed) as the single channel to rendering, sound and scoring · **#6**
-- [ ] **Enemies and spawner** — Chaser (pursue, ram, explode, no score), Shooter (approach, fire in
-  range), both colliding with islands; spawn interval, distribution, safe spawn points · **#7**
+- [x] **Enemies and spawner** — Chaser (pursue, ram, explode, `ram` cause scores nothing), Shooter
+  (approach to preferred distance, aimed fire in range); both through the player's `moveShip`, with
+  probe-based land avoidance that commits to a detour (an uncommitted version got Chasers pinned
+  against coasts). Spawner: interval, alive cap, seeded safe points; the first two spawns are one
+  of each type so both always appear · **#7**
 - [ ] **Match rules** — timer (60–180 s), score, end by time or death, everything stops at the end,
   clean restart, manual pause and auto-pause on blur/hidden with explicit resume · **#8**
 - [ ] **Pixi renderer** — water/islands, ships with damage states, health bars above ships, muzzle
@@ -95,6 +98,8 @@ Priority is **consequence, not effort** — "what happens to the evaluation if t
   `engines.node` (Vercel would auto-upgrade Node on the next major — now `>=22 <25`, with CI and
   production on 24), and the asset script's own `--disable-warning` flag, flagged only because the
   line contains the word (the script is now plain JavaScript checked through JSDoc) · **#27**
+- [x] **Ships ending a hair inside land** — collision pushed circles out to exactly their radius,
+  and rounding left some 1e-12 inside; caught by the enemy tests, fixed with a 1e-6 skin · **#30**
 
 ## Suggested sequence
 
