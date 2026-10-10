@@ -7,7 +7,9 @@ runtime files into `public/game/` (git-ignored) on every `pnpm dev` and `pnpm bu
 
 All files in this folder come unmodified from the challenge repository
 [`junglegaming/game-developer-challenge`](https://github.com/junglegaming/game-developer-challenge),
-`assets/` directory, commit `315891441be81ca0bff75cf3c2b0cd2f27f119cd` (2026-09-09).
+`assets/` directory, commit `315891441be81ca0bff75cf3c2b0cd2f27f119cd` (2026-09-09). The only
+change is line endings: the text files (`.xml`, `.json`, `.txt`) were committed with CRLF and are
+stored with LF, per this repository's `.gitattributes`.
 
 ## License
 
