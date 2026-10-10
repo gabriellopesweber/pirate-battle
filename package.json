@@ -8,8 +8,9 @@
     "node": ">=22"
   },
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
+    "assets": "node --disable-warning=ExperimentalWarning scripts/build-assets.ts",
+    "dev": "pnpm assets && vite",
+    "build": "tsc -b && pnpm assets && vite build",
     "preview": "vite preview",
     "lint": "eslint .",
     "typecheck": "tsc -b --noEmit",
