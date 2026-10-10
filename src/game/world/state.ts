@@ -6,6 +6,7 @@
 import type { GameConfig } from '@/game/config/gameConfig'
 import type { EntityId, EntityStore } from '@/game/core/entityStore'
 import type { Rng } from '@/game/core/rng'
+import type { Enemy } from '@/game/entities/enemy'
 import type { Projectile } from '@/game/entities/projectile'
 import type { Ship, ShipControls } from '@/game/entities/ship'
 import type { Cooldown } from '@/game/systems/cooldown'
@@ -21,7 +22,9 @@ export interface World {
   readonly player: Ship
   /** Front cannon and each broadside fire independently. */
   readonly playerWeapons: { front: Cooldown; left: Cooldown; right: Cooldown }
-  readonly enemies: EntityStore<Ship>
+  readonly enemies: EntityStore<Enemy>
+  /** Seconds to the next spawn, and how many enemies have spawned so far. */
+  readonly spawner: { timer: number; count: number }
   readonly projectiles: EntityStore<Projectile>
   /** Events of the last step only; cleared at the start of each step. */
   events: GameEvent[]

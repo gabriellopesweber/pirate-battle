@@ -1,11 +1,15 @@
 import type { GameConfig } from '@/game/config/gameConfig'
 import { createIdAllocator, EntityStore } from '@/game/core/entityStore'
 import { createRng } from '@/game/core/rng'
+import type { Enemy } from '@/game/entities/enemy'
 import type { Projectile } from '@/game/entities/projectile'
-import { createShip, type Ship } from '@/game/entities/ship'
+import { createShip } from '@/game/entities/ship'
+import { resolveRams } from '@/game/systems/combat'
 import { readyCooldown, tickCooldown } from '@/game/systems/cooldown'
+import { updateEnemies } from '@/game/systems/enemyAi'
 import { moveShip } from '@/game/systems/movement'
 import { updateProjectiles } from '@/game/systems/projectiles'
+import { updateSpawner } from '@/game/systems/spawner'
 import { broadsideOffsets, fireVolley } from '@/game/systems/weapons'
 import { circleIsClear, createArena } from '@/game/world/arena'
 import type { PlayerInput, StepInput, World } from '@/game/world/state'
@@ -27,7 +31,8 @@ export function createWorld(config: Readonly<GameConfig>, seed: number): World {
     nextId,
     player,
     playerWeapons: { front: readyCooldown(), left: readyCooldown(), right: readyCooldown() },
-    enemies: new EntityStore<Ship>(nextId),
+    enemies: new EntityStore<Enemy>(nextId),
+    spawner: { timer: config.spawn.intervalSeconds, count: 0 },
     projectiles: new EntityStore<Projectile>(nextId),
     events: [],
     time: 0,
@@ -38,8 +43,11 @@ export function createWorld(config: Readonly<GameConfig>, seed: number): World {
 export function stepWorld(world: World, input: StepInput, dt: number): void {
   world.events = []
   moveShip(world.player, input.player, world.config.player, world.arena, dt)
+  updateEnemies(world, dt)
   firePlayerWeapons(world, input.player, dt)
   updateProjectiles(world, dt)
+  resolveRams(world)
+  updateSpawner(world, dt)
   world.enemies.flush()
   world.projectiles.flush()
   world.time += dt

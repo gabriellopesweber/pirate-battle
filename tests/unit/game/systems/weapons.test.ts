@@ -1,12 +1,17 @@
 import { describe, expect, it } from 'vitest'
-import { DEFAULT_GAME_CONFIG } from '@/game/config/gameConfig'
+import { DEFAULT_GAME_CONFIG, type GameConfig } from '@/game/config/gameConfig'
 import type { Vec2 } from '@/game/core/vector'
-import { createShip } from '@/game/entities/ship'
+import { createEnemy } from '@/game/entities/enemy'
 import type { GameEvent } from '@/game/world/events'
 import { IDLE_PLAYER_INPUT, type PlayerInput, type World } from '@/game/world/state'
 import { createWorld, stepWorld } from '@/game/world/world'
 
-const config = DEFAULT_GAME_CONFIG
+// These tests are about projectile rules, so targets are inert: Shooters
+// that cannot move, turn or fire, and no spawns.
+const config: GameConfig = structuredClone(DEFAULT_GAME_CONFIG)
+config.shooter = { ...config.shooter, maxSpeed: 0, acceleration: 0, turnSpeed: 0, attackRange: 0 }
+config.spawn.intervalSeconds = Number.POSITIVE_INFINITY
+
 const DT = config.simulation.stepSeconds
 const { frontWeapon, broadside } = config.player
 
@@ -24,7 +29,7 @@ const ofType = <T extends GameEvent['type']>(events: GameEvent[], type: T) =>
   events.filter((e): e is Extract<GameEvent, { type: T }> => e.type === type)
 
 function addEnemy(world: World, position: Vec2, health?: number) {
-  const enemy = world.enemies.add((id) => createShip(id, 'shooter', config.shooter, position, 0))
+  const enemy = world.enemies.add((id) => createEnemy(id, 'shooter', config, position, 0))
   if (health !== undefined) enemy.health = health
   return enemy
 }

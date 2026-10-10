@@ -124,6 +124,10 @@ that merely grazes a coast.
 **No tunnelling:** the fastest ship moves under 3 units per 1/60 s step against a 64-unit tile, so
 a ship can never skip over land in one step.
 
+Pushed circles end a 1e-6 **skin** beyond their radius rather than exactly tangent: rounding would
+otherwise leave some a hair inside the tile, and the next overlap test would count them as
+touching land (#30).
+
 Movement is shared: `moveShip` takes `ShipControls` (thrust, turn), produced by player input or by
 enemy AI. Ships only move forward, as the brief specifies.
 
@@ -151,7 +155,37 @@ A ship reaching zero health is destroyed by `damageShip`: enemies leave their st
 firing and taking hits immediately — the second and third projectiles of a broadside that killed
 it fly on.
 
-## Simulation events
+## Enemies
+
+Enemy AI (`src/game/systems/enemyAi.ts`) only produces `ShipControls`; enemies move through the
+same `moveShip` as the player, so they obey the same speeds, turn rates and island collisions.
+
+- **Chaser** — always under thrust, turns towards the player. On contact it deals
+  `contactDamage` and explodes (`resolveRams` in `combat.ts`). The explosion is a `destroyed`
+  event with cause `ram`, which scores nothing.
+- **Shooter** — approaches until `preferredDistance`, then coasts. While the player is within
+  `attackRange` it fires aimed shots at its weapon's cooldown.
+
+**Land avoidance.** A probe `LOOKAHEAD` units ahead and two side probes look for land. When the way
+pursuit wants to go — straight ahead, or the side it wants to turn to — is blocked, the enemy turns
+to the clear side and **commits to that turn for half a second**. Without the commitment, pursuit
+and avoidance alternated every step and a Chaser turning towards the player through an island got
+pinned against the coast, nudging back and forth. This is a local rule, not pathfinding: an enemy
+can lose time behind an island, but it keeps moving around it — tested by chasing the player
+across the L-shaped island.
+
+### Spawning
+
+`updateSpawner` spawns one enemy every `spawn.intervalSeconds` while fewer than `maxAliveEnemies`
+are alive. A spawn point is drawn from the seeded RNG and accepted only if it is:
+
+- open water at least `clearance` away from land and from the arena edge;
+- at least `minDistanceFromPlayer` from the player — no unavoidable damage on arrival;
+- clear of other enemies.
+
+After 40 rejected candidates the spawn is skipped until the next interval; the cadence is never
+shortened to make up for it. The **first two spawns are one Chaser and one Shooter**, so both
+types appear in every match whatever the weights; later spawns follow `spawn.weights`.
 
 Each step produces a list of `GameEvent`s — `shot`, `hit`, `splash`, `destroyed` — cleared at the
 start of the next step. They are the only channel from the rules to everything else: the renderer

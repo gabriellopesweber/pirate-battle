@@ -85,7 +85,7 @@ describe('moveShip', () => {
       moveShip(ship, THRUST, stats, arena, DT)
     })
 
-    expect(ship.position.x).toBeCloseTo(stats.radius, 6)
+    expect(ship.position.x).toBeCloseTo(stats.radius, 4)
     expect(ship.speed).toBeCloseTo(0, 6)
   })
 
@@ -98,7 +98,7 @@ describe('moveShip', () => {
       expect(circleHitsLand(arena, ship.position, ship.radius)).toBe(false)
     })
 
-    expect(ship.position.x).toBeCloseTo(600 - stats.radius, 6)
+    expect(ship.position.x).toBeCloseTo(600 - stats.radius, 4)
     expect(ship.speed).toBeCloseTo(0, 6)
   })
 
@@ -111,7 +111,7 @@ describe('moveShip', () => {
       expect(circleHitsLand(arena, ship.position, ship.radius)).toBe(false)
     })
 
-    expect(ship.position.x).toBeCloseTo(600 - stats.radius, 6)
+    expect(ship.position.x).toBeCloseTo(600 - stats.radius, 4)
     expect(ship.position.y).toBeGreaterThan(360)
     expect(ship.speed).toBeGreaterThan(0)
   })
