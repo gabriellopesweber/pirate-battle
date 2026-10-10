@@ -24,7 +24,7 @@ the clock runs out. Built with React, TypeScript and PixiJS.
 
 ## Setup
 
-Requirements: Node.js 22+ and pnpm 11.
+Requirements: Node.js 22–24 (CI and production run 24) and pnpm 11.
 
 ```bash
 pnpm install

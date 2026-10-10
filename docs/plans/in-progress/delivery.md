@@ -29,8 +29,7 @@ Priority is **consequence, not effort** — "what happens to the evaluation if t
 ## 🔴 Wave 1 — playable, deployed, and honest about its rules
 
 - [x] **Tooling, CI and deploy** — lint/typecheck/unit/build/E2E in GitHub Actions; Vercel Git
-  integration (production from `main`, previews on PRs — previews sit behind Vercel's login, so
-  production is the only public URL). Live at https://gabriellopesweber-pirate-battle.vercel.app.
+  integration deploying `main` only (#27). Live at https://gabriellopesweber-pirate-battle.vercel.app.
   Smoke E2E guards render and SPA fallback · **#2** (PR #21)
 - [x] **Asset pipeline** — provided assets kept unmodified in `assets/` (unused individual PNGs,
   vector sources and reference images left out, documented); build script converts the ships XML,
@@ -87,8 +86,13 @@ Priority is **consequence, not effort** — "what happens to the evaluation if t
 
 ## Found along the way
 
-- [ ] **CI once per change** — the `push: main` trigger re-ran the PR's checks after every merge
+- [x] **CI once per change** — the `push: main` trigger re-ran the PR's checks after every merge
   and on docs-only commits; the PR run already tests the merge result · **#24**
+- [x] **Vercel deploys `main` only, with a clean build log** — previews sat behind Vercel's login
+  and duplicated what CI checks. The build log showed two warnings: an open-ended
+  `engines.node` (Vercel would auto-upgrade Node on the next major — now `>=22 <25`, with CI and
+  production on 24), and the asset script's own `--disable-warning` flag, flagged only because the
+  line contains the word (the script is now plain JavaScript checked through JSDoc) · **#27**
 
 ## Suggested sequence
 
