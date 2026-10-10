@@ -3,8 +3,10 @@
 A top-down 2D naval shooter: sail between islands, sink enemy ships and climb the ranking before
 the clock runs out. Built with React, TypeScript and PixiJS.
 
-> 🚧 **Work in progress.** Live URL, controls and gameplay configuration will be documented here as
-> they land.
+**Live:** https://gabriellopesweber-pirate-battle.vercel.app
+
+> 🚧 **Work in progress.** Controls and gameplay configuration will be documented here as they
+> land.
 
 ## Stack
 
