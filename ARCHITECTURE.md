@@ -48,13 +48,24 @@ types while files change. There are no import cycles in `src/`.
 
 ## React ↔ PixiJS integration
 
-A `GameSession` class owns the Pixi `Application`, the ticker, input listeners and the simulation.
-One React component mounts it into a container element and destroys it on unmount, guarding the
-async `init()` against Strict Mode's mount → unmount → mount.
+A `GameSession` class (`src/render/GameSession.ts`) owns the Pixi `Application`, the fixed-step
+loop, the `Match`, the scene and the auto-pause listeners. `GameView` creates it in an effect and
+destroys it in the cleanup:
 
-The UI subscribes to a small external store (`useSyncExternalStore`) that the session updates only
-when a displayed value changes — score, whole seconds, health, match status — so React never
-re-renders per frame.
+- `GameSession.create` is **synchronous** — the session exists at once and Pixi's async `init()`
+  runs behind it. So React can destroy it at any moment, including during start-up.
+- `destroy()` is idempotent. If it arrives while Pixi is still starting (Strict Mode's first
+  unmount, or leaving the screen quickly), the teardown is deferred to the end of `init()`, which
+  then never mounts a canvas.
+- Teardown removes the ticker callback and the focus listeners, destroys the scene and the Pixi
+  application (`removeView`), and keeps the atlas textures, which are shared by every match.
+  An E2E test checks that the page holds exactly one canvas under Strict Mode.
+
+The UI subscribes to a small external store (`useSyncExternalStore`, `src/render/hudStore.ts`).
+The session calls `publish` every frame, but listeners only run when a displayed value changes —
+score, whole seconds, health, match status — so React re-renders a few times per second at most,
+never per frame. The store exposes function-typed properties, not methods, because React receives
+`subscribe` and `getSnapshot` detached from the object.
 
 **Why not `@pixi/react`.** It maps Pixi objects to JSX, which suits scenes where little changes per
 frame. Here dozens of ships, projectiles and effects move every frame: driving them through React
@@ -83,8 +94,12 @@ equal simulation steps (default 1/60 s):
 every rendered frame:  accumulator += frame time
                        while accumulator ≥ step and steps this frame < max:
                            simulation.step(step); accumulator -= step
-render with alpha = accumulator / step
+                       draw the latest simulation state
 ```
+
+The renderer draws the latest step without interpolating between steps (the loop exposes
+`alpha` for it). At 60 Hz displays that is exact; on 120–144 Hz displays motion advances in 60 Hz
+increments — a known limitation, listed below.
 
 - **Frame-rate independent.** 1 s of real time is 60 steps at 30, 60 or 144 Hz — covered by a
   unit test comparing 30 Hz and 144 Hz runs.
@@ -108,9 +123,13 @@ collide, deal damage or fire later in the same step — and physically removed o
 ### Ships against land and the arena edge
 
 The provided island art is built from 64 × 64 sand tiles, so the arena is a **tile grid**: each
-island is authored as a union of tile rectangles in `GameConfig.arena` and rasterised once into a
-land mask (`src/game/world/arena.ts`). The renderer draws the same mask, so what the player sees
-blocking a ship is exactly what blocks it.
+island is authored as tile rectangles in `GameConfig.arena` and rasterised once into a land mask
+(`src/game/world/arena.ts`). The renderer draws each island over the same boxes, so what the player
+sees blocking a ship is what blocks it.
+
+Islands are kept within 3 × 3 tiles. The sand art is a single 3 × 3 island whose nine pieces only
+join seamlessly in that arrangement; assembling bigger or 2-wide islands tile by tile showed seams.
+Each island is therefore drawn as the whole artwork stretched to its box (see Rendering).
 
 Ships are circles. After each move, `resolveCircleAgainstArena` pushes the circle out of every
 overlapping land tile along the line from the tile's closest point to the circle's centre — which
@@ -166,13 +185,20 @@ same `moveShip` as the player, so they obey the same speeds, turn rates and isla
 - **Shooter** — approaches until `preferredDistance`, then coasts. While the player is within
   `attackRange` it fires aimed shots at its weapon's cooldown.
 
-**Land avoidance.** A probe `LOOKAHEAD` units ahead and two side probes look for land. When the way
-pursuit wants to go — straight ahead, or the side it wants to turn to — is blocked, the enemy turns
-to the clear side and **commits to that turn for half a second**. Without the commitment, pursuit
-and avoidance alternated every step and a Chaser turning towards the player through an island got
-pinned against the coast, nudging back and forth. This is a local rule, not pathfinding: an enemy
-can lose time behind an island, but it keeps moving around it — tested by chasing the player
-across the L-shaped island.
+**Getting around islands.** While the player is in sight — a ship-wide line to it crosses no land —
+an enemy steers straight at it; a ship turns in place, so pointing its bow never collides, and
+grazing a coast just slides. When land hides the player, the enemy steers instead to a **corner of
+an island**, pushed out by its radius plus a margin: of the corners it can see, the one that
+minimises ship → corner → player, preferring corners that see the player (`waypoint` in
+`enemyAi.ts`). The choice is re-made every step, so a ship straight behind an island heads for a
+near corner, then the far corner comes into view and it chains on. It is a one-hop visibility graph
+re-run each step: stateless, so nothing can get stuck in a mode, and it always gets round the
+convex islands of this arena.
+
+Two local rules came first and were dropped (#33): "turn away from land ahead" pinned a Chaser
+against a coast, and "turn away and commit for half a second" sent one circling below an island
+forever — pursuit kept pulling it back into the island. Both were found by tracing a ship step by
+step when a test failed.
 
 ### Spawning
 
@@ -219,6 +245,28 @@ counts score from `destroyed` events whose cause is `player-fire`. A kill is **o
 cannot be counted twice, and a Chaser exploding on the player (`ram`) is distinguishable from a
 kill and does not score.
 
+## Rendering
+
+`Scene` (`src/render/scene.ts`) decides nothing. Every frame it maps the world to views — a
+`ShipView` per ship, a sprite per projectile — creating a view for a new entity, updating existing
+ones and destroying views whose entity is gone; every step it turns events into effects.
+
+- **Arena** (`arenaView.ts`): tiled water and one stretched 3 × 3 island artwork per island box.
+  It never changes during a match, so it is drawn once into a texture (`cacheAsTexture`) instead of
+  every frame. The island cut is the view's own texture and is destroyed with it.
+- **Ships** (`shipView.ts`): hull textures follow the atlas's four damage stages — intact, damaged,
+  badly damaged, wreck (`ship_1–24`: six colours × four stages; player blue, Chaser black, Shooter
+  red). A fire burns on a badly damaged hull. Hull sprites face down, so a hull is rotated by
+  `heading − π/2`.
+- **Health bars** (`healthBar.ts`): drawn from the UI atlas the way its metadata describes — the fill
+  sprite over the frame, clipped from the left inside `fill_rect`. The clipped fill is a texture
+  re-cut only when health changes, so a bar costs nothing between hits.
+- **Effects** (`effects.ts`): muzzle flash on `shot`, flash and wood debris on `hit`, a ring on
+  `splash`, an explosion on `destroyed`, and a fading wreck where an enemy sank. They advance with
+  the time the session passes in — zero while paused — so they freeze with the match.
+- **Letterbox:** the world is scaled to fit the canvas at its own aspect ratio and centred, so the
+  whole arena is always visible. Re-laid out whenever the canvas size changes.
+
 ## Resource management
 
 ### Asset pipeline
@@ -256,4 +304,11 @@ _Written with the API: contracts, cache keys, invalidation, pending-registration
 
 ## Balancing decisions and known limitations
 
-_Filled in as they happen._
+- **Islands within 3 × 3 tiles**, six of them, two flanking the player's start as cover — chosen
+  so the provided sand art has no seams (see Collisions).
+- **No render interpolation:** motion advances in 60 Hz increments on faster displays.
+- **Enemy navigation assumes convex islands:** corner waypoints always get around a box, not
+  around arbitrary shapes. Every island in this arena is a box.
+- **Ships overlap each other:** only ship ↔ land and Chaser ↔ player contacts are resolved.
+- **E2E runs two workers:** each renders the game with software WebGL in headless Chromium; more
+  in parallel starved each other and pushed Pixi's start-up past assertion timeouts.

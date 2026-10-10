@@ -5,7 +5,7 @@ const SHIPS_IMAGE = '**/game/ships.png'
 test('loads the game assets', async ({ page }) => {
   await page.goto('/')
 
-  await expect(page.getByRole('status')).toHaveText('Assets loaded.')
+  await expect(page.locator('canvas')).toBeVisible()
 })
 
 test('shows progress while the assets are loading', async ({ page }) => {
@@ -22,7 +22,7 @@ test('shows progress while the assets are loading', async ({ page }) => {
 
   await expect(page.getByRole('progressbar', { name: 'Loading the fleet…' })).toBeVisible()
   release()
-  await expect(page.getByRole('status')).toHaveText('Assets loaded.')
+  await expect(page.locator('canvas')).toBeVisible()
 })
 
 test('reports a failed load and recovers on retry', async ({ page }) => {
@@ -38,5 +38,5 @@ test('reports a failed load and recovers on retry', async ({ page }) => {
   await page.unroute(SHIPS_IMAGE)
   await retry.click()
 
-  await expect(page.getByRole('status')).toHaveText('Assets loaded.')
+  await expect(page.locator('canvas')).toBeVisible()
 })

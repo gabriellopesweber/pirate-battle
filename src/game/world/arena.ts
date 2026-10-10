@@ -8,12 +8,22 @@ import { clamp, type Vec2 } from '@/game/core/vector'
  * renderer draws exactly the cells the rules collide with — what the player
  * sees blocking a ship is what blocks it.
  */
+/** An axis-aligned box in world units. */
+export interface Box {
+  readonly left: number
+  readonly top: number
+  readonly right: number
+  readonly bottom: number
+}
+
 export interface Arena {
   readonly tileSize: number
   readonly cols: number
   readonly rows: number
   readonly width: number
   readonly height: number
+  /** Bounding box of each island, for steering around it. */
+  readonly islands: readonly Box[]
   isLand(col: number, row: number): boolean
   /** Land at a world position. Outside the arena counts as land. */
   isLandAt(x: number, y: number): boolean
@@ -41,12 +51,20 @@ export function createArena(config: ArenaConfig): Arena {
     return land[row * cols + col] === 1
   }
 
+  const islands = config.islands.map((island) => ({
+    left: Math.min(...island.map((r) => r.col)) * tileSize,
+    top: Math.min(...island.map((r) => r.row)) * tileSize,
+    right: Math.max(...island.map((r) => r.col + r.cols)) * tileSize,
+    bottom: Math.max(...island.map((r) => r.row + r.rows)) * tileSize,
+  }))
+
   return {
     tileSize,
     cols,
     rows,
     width: cols * tileSize,
     height: rows * tileSize,
+    islands,
     isLand,
     isLandAt: (x, y) => {
       if (x < 0 || y < 0 || x >= cols * tileSize || y >= rows * tileSize) return true

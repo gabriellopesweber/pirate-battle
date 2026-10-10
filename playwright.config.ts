@@ -9,6 +9,10 @@ const BASE_URL = `http://localhost:${String(PORT)}`
 export default defineConfig({
   testDir: './tests/e2e',
   fullyParallel: true,
+  // Each worker renders the game with software WebGL (no GPU in CI or headless
+  // runs); more than two at once starve each other and slow Pixi's start-up
+  // past the assertion timeouts.
+  workers: 2,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
   reporter: [['html', { open: 'never' }], ['list']],

@@ -106,17 +106,16 @@ export const DEFAULT_GAME_CONFIG: GameConfig = {
     tileSize: 64,
     cols: 25,
     rows: 14,
+    // Islands stay within 3 × 3 tiles: the sand art is one 3 × 3 island and
+    // only joins seamlessly in that arrangement (see render/arenaView.ts).
     islands: [
-      [
-        { col: 3, row: 2, cols: 4, rows: 2 },
-        { col: 3, row: 4, cols: 2, rows: 2 },
-      ],
-      [{ col: 18, row: 2, cols: 2, rows: 2 }],
+      [{ col: 3, row: 2, cols: 3, rows: 3 }],
+      [{ col: 19, row: 2, cols: 2, rows: 2 }],
       [{ col: 6, row: 10, cols: 2, rows: 2 }],
-      [
-        { col: 16, row: 10, cols: 5, rows: 2 },
-        { col: 19, row: 8, cols: 2, rows: 2 },
-      ],
+      [{ col: 17, row: 9, cols: 3, rows: 2 }],
+      // Cover on both sides of the player's start.
+      [{ col: 8, row: 4, cols: 2, rows: 2 }],
+      [{ col: 15, row: 3, cols: 2, rows: 3 }],
     ],
     playerSpawn: { x: 800, y: 448 },
   },

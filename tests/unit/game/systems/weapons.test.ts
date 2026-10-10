@@ -121,14 +121,14 @@ describe('projectiles', () => {
 
   it('stop at an island', () => {
     const world = newWorld()
-    // West of the top-left island (x 192-448, y 128-256), bow up: port fire heads west into it.
-    world.player.position = { x: 600, y: 192 }
+    // East of the 3 × 3 island (x 192-384, y 128-320), bow up: port fire heads west into it.
+    world.player.position = { x: 600, y: 200 }
 
     const events = hold(world, { fireLeft: true }, 60)
 
     const splashes = ofType(events, 'splash')
     expect(splashes).toHaveLength(broadside.projectileCount)
-    expect(splashes.every((s) => s.onLand && s.position.x > 440)).toBe(true)
+    expect(splashes.every((s) => s.onLand && s.position.x > 380)).toBe(true)
     expect(world.projectiles.size).toBe(0)
   })
 

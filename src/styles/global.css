@@ -23,3 +23,20 @@ body {
   color: var(--color-ink);
   font-family: var(--font-body);
 }
+
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.app__title {
+  margin: 0;
+  padding: 0.5rem 1rem;
+  font-size: 1.25rem;
+}
+
+.app > :last-child {
+  flex: 1;
+  min-height: 0;
+}

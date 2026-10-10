@@ -59,8 +59,13 @@ Priority is **consequence, not effort** — "what happens to the evaluation if t
   as a new match. Time-up results store the exact duration (summed steps drift). Focus-loss
   detection is a DOM-free module; wiring it to the browser lands with the game session (#9) ·
   **#8**
-- [ ] **Pixi renderer** — water/islands, ships with damage states, health bars above ships, muzzle
-  flash, impacts, explosions; DPR-aware resize with letterboxing · **#9**
+- [x] **Pixi renderer** — `GameSession` (synchronous create, idempotent destroy, deferred teardown
+  during start-up: one canvas under Strict Mode), scene mapping entities to views, hulls through the
+  atlas's four damage stages, fire when badly damaged, health bars clipped as the UI metadata
+  describes, time-driven effects that freeze on pause, letterbox, HUD store. Divergences: the arena
+  layout changed to islands within 3 × 3 tiles, each drawn as the whole stretched artwork, because
+  tile-by-tile islands showed seams; no render interpolation; a temporary HUD until the screens
+  (#11). Wiring auto-pause to the browser landed here as planned in #8 · **#9**
 - [ ] **Input** — keyboard and touch, simultaneous move + fire, captured only during gameplay,
   no input accumulated while paused · **#10**
 - [ ] **React screens** — main menu (Play, Options, controls, tabs), Options with validation and
@@ -103,6 +108,9 @@ Priority is **consequence, not effort** — "what happens to the evaluation if t
   line contains the word (the script is now plain JavaScript checked through JSDoc) · **#27**
 - [x] **Ships ending a hair inside land** — collision pushed circles out to exactly their radius,
   and rounding left some 1e-12 inside; caught by the enemy tests, fixed with a 1e-6 skin · **#30**
+- [x] **Enemies circling behind islands** — with the new layout, local avoidance rules pinned a
+  Chaser against a coast or sent it circling below an island; replaced by corner waypoints from a
+  one-hop visibility graph re-run each step · **#33**
 
 ## Suggested sequence
 
