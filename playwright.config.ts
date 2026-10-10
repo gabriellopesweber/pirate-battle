@@ -1,6 +1,7 @@
 import { defineConfig, devices } from '@playwright/test'
 
-const PORT = 4173
+// Dedicated port so a preview server from another project is never reused by mistake.
+const PORT = 4730
 const BASE_URL = `http://localhost:${String(PORT)}`
 
 // Runs against the production build (`vite preview`) so tests exercise the
@@ -25,7 +26,7 @@ export default defineConfig({
     { name: 'mobile-chromium', use: { ...devices['Pixel 7'] } },
   ],
   webServer: {
-    command: 'pnpm build && pnpm preview',
+    command: `pnpm build && pnpm preview --port ${String(PORT)} --strictPort`,
     port: PORT,
     reuseExistingServer: !process.env.CI,
     timeout: 180_000,
