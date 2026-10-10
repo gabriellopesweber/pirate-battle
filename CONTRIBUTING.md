@@ -38,6 +38,10 @@ with the last two written.
 3. Open a PR into `main` with `Closes #<n>`; CI must pass
 4. Merge and delete the branch
 
+CI runs on pull requests only, against the PR merged into the current `main` — it does not run
+again after the merge. So a PR must be **up to date with `main`** when it is merged: if `main`
+moved after the last CI run, update the branch and let CI run again first.
+
 **Documentation-only changes** (plans, `docs/`, this file) go straight to `main` — no issue, no PR.
 Documentation that accompanies a code change goes in the same PR as the code.
 
