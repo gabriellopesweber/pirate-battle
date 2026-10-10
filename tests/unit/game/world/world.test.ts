@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { DEFAULT_GAME_CONFIG } from '@/game/config/gameConfig'
 import { circleHitsLand } from '@/game/world/arena'
+import { IDLE_PLAYER_INPUT } from '@/game/world/state'
 import { createWorld, stepWorld } from '@/game/world/world'
 
 describe('world', () => {
@@ -25,7 +26,7 @@ describe('world', () => {
 
     for (let i = 0; i < 60 * 60; i++) {
       const turn = ([-1, 0, 1] as const)[Math.floor(i / 90) % 3] ?? 0
-      stepWorld(world, { player: { thrust: true, turn } }, dt)
+      stepWorld(world, { player: { ...IDLE_PLAYER_INPUT, thrust: true, turn } }, dt)
       expect(circleHitsLand(world.arena, world.player.position, world.player.radius)).toBe(false)
     }
 

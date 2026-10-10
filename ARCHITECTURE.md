@@ -40,6 +40,12 @@ tests/
 Dependency direction: `ui → app → render / input → game`. `game/` imports nothing from React or
 Pixi, which is what lets it run under Vitest without a canvas.
 
+Inside `game/`, the match state types (`World`, `PlayerInput`) live in `world/state.ts`, apart from
+`world/world.ts`, which builds and steps the world. Systems import the types from `state.ts`;
+`world.ts` imports the systems. Keeping the types in `world.ts` created import cycles
+(`world → projectiles → world`) that the compiler tolerates but editors resolve as half-built
+types while files change. There are no import cycles in `src/`.
+
 ## React ↔ PixiJS integration
 
 A `GameSession` class owns the Pixi `Application`, the ticker, input listeners and the simulation.
@@ -120,6 +126,39 @@ a ship can never skip over land in one step.
 
 Movement is shared: `moveShip` takes `ShipControls` (thrust, turn), produced by player input or by
 enemy AI. Ships only move forward, as the brief specifies.
+
+### Projectiles
+
+Weapons (`src/game/systems/weapons.ts`): the front cannon fires one projectile along the heading;
+each broadside fires `projectileCount` parallel projectiles perpendicular to it, spaced along the
+hull. Front, port and starboard keep **independent cooldowns**; a held button repeats exactly at
+the cooldown rate. Projectiles leave from just outside the hull, so a ship never hits itself.
+
+Every step, `updateProjectiles` moves each projectile and resolves, in order:
+
+1. **a ship of the other side** — player fire hits enemies, enemy fire hits the player, never
+   their own side. Damage is applied and the projectile removed **in the same step**, so it
+   damages at most one ship, once;
+2. **land** — removed with a splash on land;
+3. **the arena edge** — removed silently;
+4. **expiry** — `projectileLifetimeSeconds` elapsed (range = speed × lifetime), splash in water.
+
+Projectiles move under 8 units per step against ships of 20+ units radius and 64-unit tiles, so
+nothing is skipped between steps.
+
+A ship reaching zero health is destroyed by `damageShip`: enemies leave their store at once
+(deferred removal hides them for the rest of the step), so a destroyed ship stops colliding,
+firing and taking hits immediately — the second and third projectiles of a broadside that killed
+it fly on.
+
+## Simulation events
+
+Each step produces a list of `GameEvent`s — `shot`, `hit`, `splash`, `destroyed` — cleared at the
+start of the next step. They are the only channel from the rules to everything else: the renderer
+turns them into muzzle flashes, impacts and explosions, sound plays from them, and the match
+counts score from `destroyed` events whose cause is `player-fire`. A kill is **one event**, so it
+cannot be counted twice, and a Chaser exploding on the player (`ram`) is distinguishable from a
+kill and does not score.
 
 ## Resource management
 
