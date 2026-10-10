@@ -1,0 +1,40 @@
+.asset-gate {
+  display: grid;
+  justify-items: center;
+  gap: 1rem;
+  padding: 2rem 1rem;
+  text-align: center;
+}
+
+.asset-gate__message {
+  margin: 0;
+}
+
+.asset-gate__bar {
+  width: min(20rem, 80vw);
+  height: 0.75rem;
+  border: 2px solid var(--color-ink);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.asset-gate__fill {
+  height: 100%;
+  background: var(--color-ink);
+  transition: width 120ms linear;
+}
+
+.asset-gate__retry {
+  padding: 0.5rem 1.5rem;
+  border: 2px solid var(--color-ink);
+  border-radius: 0.5rem;
+  background: transparent;
+  color: var(--color-ink);
+  font: inherit;
+  cursor: pointer;
+}
+
+.asset-gate__retry:focus-visible {
+  outline: 3px solid var(--color-ink);
+  outline-offset: 3px;
+}
