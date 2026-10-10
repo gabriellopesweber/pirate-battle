@@ -1,9 +1,9 @@
 name: CI
 
+# Pull requests only: GitHub runs them against the PR merged into the current
+# main, so re-running after the merge would repeat the same checks.
 on:
   pull_request:
-  push:
-    branches: [main]
 
 concurrency:
   group: ci-${{ github.ref }}
