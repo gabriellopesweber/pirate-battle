@@ -87,3 +87,13 @@ test('shows the scores tabs on the menu', async ({ page }) => {
   await page.getByRole('tab', { name: 'Match History' }).click()
   await expect(page.getByRole('tabpanel', { name: 'Match History' })).toBeVisible()
 })
+
+test('the menu fits a small laptop screen without scrolling', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'the mobile layout is checked with the orientation work (#17)')
+  await page.setViewportSize({ width: 1366, height: 600 })
+  await openMenu(page)
+
+  const panel = page.locator('.screen')
+  const overflow = await panel.evaluate((element) => element.scrollHeight - element.clientHeight)
+  expect(overflow).toBeLessThanOrEqual(0)
+})

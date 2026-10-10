@@ -41,7 +41,7 @@
 
 .menu-button {
   /* 256 × 88 frame; the label sits in the frame's label_rect. */
-  width: 15rem;
+  width: 13rem;
   aspect-ratio: 256 / 88;
   padding: 0 1.5rem 0.2rem;
   font-weight: 800;
