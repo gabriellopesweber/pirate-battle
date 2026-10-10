@@ -5,10 +5,10 @@
   "type": "module",
   "packageManager": "pnpm@11.25.0",
   "engines": {
-    "node": ">=22"
+    "node": ">=22 <25"
   },
   "scripts": {
-    "assets": "node --disable-warning=ExperimentalWarning scripts/build-assets.ts",
+    "assets": "node scripts/build-assets.mjs",
     "dev": "pnpm assets && vite",
     "build": "tsc -b && pnpm assets && vite build",
     "preview": "vite preview",
