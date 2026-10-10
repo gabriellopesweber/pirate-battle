@@ -1,0 +1,76 @@
+.panel {
+  border-style: solid;
+  border-width: 40px 32px;
+  border-image-slice: 40 32 fill;
+  border-image-repeat: stretch;
+  padding: 0.5rem 1rem;
+  color: var(--color-ink);
+  text-align: center;
+}
+
+.menu-button,
+.round-button {
+  border: 0;
+  background: var(--frame-normal) center / 100% 100% no-repeat;
+  cursor: pointer;
+  font: inherit;
+}
+
+.menu-button:hover,
+.round-button:hover {
+  background-image: var(--frame-hover);
+}
+
+.menu-button:active,
+.round-button:active {
+  background-image: var(--frame-pressed);
+}
+
+.menu-button:disabled {
+  background-image: var(--frame-disabled);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.menu-button:focus-visible,
+.round-button:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+  border-radius: 1rem;
+}
+
+.menu-button {
+  /* 256 × 88 frame; the label sits in the frame's label_rect. */
+  width: 15rem;
+  aspect-ratio: 256 / 88;
+  padding: 0 1.5rem 0.2rem;
+  font-weight: 800;
+  font-size: 1.15rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.menu-button--primary {
+  color: var(--color-button-ink);
+}
+
+.menu-button--secondary {
+  width: 11rem;
+  font-size: 0.85rem;
+  color: var(--color-ink);
+}
+
+.round-button {
+  display: inline-grid;
+  place-items: center;
+  padding: 0;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

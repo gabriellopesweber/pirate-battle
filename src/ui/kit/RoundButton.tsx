@@ -1,0 +1,36 @@
+import type { ButtonHTMLAttributes, CSSProperties } from 'react'
+import { useAssets } from '@/ui/assets/AssetsContext'
+import { AtlasSprite } from '@/ui/atlas/AtlasSprite'
+import { frameImage } from '@/ui/atlas/frameImage'
+import './kit.css'
+
+interface RoundButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children'> {
+  icon: string
+  /** Accessible name: the button shows only an icon. */
+  label: string
+  size?: number
+}
+
+/** The round atlas button with an icon, laid out as the atlas metadata says (icon at half size, centred). */
+export function RoundButton({ icon, label, size = 48, className, style, type = 'button', ...props }: RoundButtonProps) {
+  const { ui } = useAssets()
+  const states: CSSProperties & Record<`--${string}`, string> = {
+    '--frame-normal': `url("${frameImage(ui, 'button_round_normal')}")`,
+    '--frame-hover': `url("${frameImage(ui, 'button_round_hover')}")`,
+    '--frame-pressed': `url("${frameImage(ui, 'button_round_pressed')}")`,
+    width: `${String(size)}px`,
+    height: `${String(size)}px`,
+  }
+  return (
+    <button
+      type={type}
+      aria-label={label}
+      title={label}
+      className={`round-button ${className ?? ''}`}
+      style={{ ...states, ...style }}
+      {...props}
+    >
+      <AtlasSprite sheet={ui} frame={icon} width={size / 2} />
+    </button>
+  )
+}
