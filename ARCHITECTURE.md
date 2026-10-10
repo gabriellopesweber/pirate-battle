@@ -57,9 +57,45 @@ while keeping the cost. An explicit class also makes the lifecycle the brief ask
 the ticker, listeners and textures; surviving Strict Mode) a single, testable `destroy()` instead of
 behaviour hidden inside a library. The trade-off is writing the entity → sprite mapping by hand.
 
+## Gameplay configuration
+
+`src/game/config/gameConfig.ts` holds every balancing number — durations, spawn interval and
+weights, health, speeds, turn rates, damage, projectile speed/lifetime/radius, cooldowns and the
+Shooter's ranges — in one typed `GameConfig`. Systems only read it.
+
+When a match starts, `createMatchConfig(base, options)` applies the player's two options to a
+`structuredClone` of the base and **deep-freezes** the result. The match keeps that snapshot for
+its whole life, so changing Options mid-match only affects the next match, and no system can
+mutate balancing by accident.
+
 ## Simulation loop
 
-_Written with the simulation core._
+`FixedStepLoop` (`src/game/core/fixedStepLoop.ts`) converts variable frame times into whole,
+equal simulation steps (default 1/60 s):
+
+```
+every rendered frame:  accumulator += frame time
+                       while accumulator ≥ step and steps this frame < max:
+                           simulation.step(step); accumulator -= step
+render with alpha = accumulator / step
+```
+
+- **Frame-rate independent.** 1 s of real time is 60 steps at 30, 60 or 144 Hz — covered by a
+  unit test comparing 30 Hz and 144 Hz runs.
+- **No spiral of death.** At most `maxStepsPerFrame` steps run per frame; after a stall the
+  backlog is dropped instead of fast-forwarding the game.
+- **Pause cannot leak time.** While paused, `advance` runs nothing; `resume` clears the
+  accumulator, so time spent paused never reaches the rules.
+- **Test clock.** `stepManually(n)` runs exact steps regardless of real time — the hook E2E tests
+  use to make combat reproducible.
+
+Randomness goes through a seeded generator (`src/game/core/rng.ts`, mulberry32): the same seed
+and the same inputs produce the same match.
+
+Entities live in `EntityStore`s keyed by ids that are never reused within a match. Removal is
+**deferred**: a destroyed entity is hidden from lookups and iteration immediately — so it cannot
+collide, deal damage or fire later in the same step — and physically removed once per step by
+`flush()`.
 
 ## Collisions
 

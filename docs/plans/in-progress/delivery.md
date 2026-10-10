@@ -34,8 +34,10 @@ Priority is **consequence, not effort** — "what happens to the evaluation if t
   Smoke E2E guards render and SPA fallback · **#2** (PR #21)
 - [ ] **Asset pipeline** — copy the provided assets, convert the ships XML atlas to Pixi JSON,
   load with visible progress, failure state and retry before combat starts · **#3**
-- [ ] **Gameplay config and simulation core** — typed, centralised config; fixed-timestep loop;
-  simulation clock that can be paused and stepped; seeded RNG; entity storage · **#4**
+- [x] **Gameplay config and simulation core** — typed, centralised config with a deep-frozen
+  per-match snapshot; option limits (60–180 s, 1–10 s); fixed-timestep loop with step cap,
+  pause without catch-up and manual stepping; seeded RNG; entity stores with deferred removal.
+  Vector math deferred to #5, where movement first needs it · **#4**
 - [ ] **Player ship** — forward movement, rotation both ways, arena bounds, island collision ·
   **#5**
 - [ ] **Weapons and projectiles** — front shot, left/right broadside (3 parallel), per-weapon
