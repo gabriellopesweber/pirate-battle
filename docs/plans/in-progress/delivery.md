@@ -90,8 +90,9 @@ item (E2E, performance) depends on the rules being deterministic.
 
 ## Decisions to confirm
 
-- ❓ **React ↔ Pixi integration** — proposed: imperative Pixi owned by a `GameSession` class,
-  mounted by one React component; React never renders per frame. Alternative: `@pixi/react`.
+- ✅ **React ↔ Pixi integration** — imperative Pixi owned by a `GameSession` class, mounted by
+  one React component; React never renders per frame. `@pixi/react` rejected — reasoning in
+  `ARCHITECTURE.md`. Decided 2026-10-10.
 - ❓ **Branch model** — proposed: `main` is default and production; one branch per issue; PRs
   into `main`. No `develop`, since there is no staging environment.
 - ❓ **Mobile orientation** — proposed: landscape only, with a "rotate your device" overlay.

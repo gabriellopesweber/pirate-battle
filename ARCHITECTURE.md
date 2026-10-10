@@ -40,7 +40,7 @@ tests/
 Dependency direction: `ui → app → render / input → game`. `game/` imports nothing from React or
 Pixi, which is what lets it run under Vitest without a canvas.
 
-## React ↔ PixiJS integration — _proposed_
+## React ↔ PixiJS integration
 
 A `GameSession` class owns the Pixi `Application`, the ticker, input listeners and the simulation.
 One React component mounts it into a container element and destroys it on unmount, guarding the
@@ -49,6 +49,13 @@ async `init()` against Strict Mode's mount → unmount → mount.
 The UI subscribes to a small external store (`useSyncExternalStore`) that the session updates only
 when a displayed value changes — score, whole seconds, health, match status — so React never
 re-renders per frame.
+
+**Why not `@pixi/react`.** It maps Pixi objects to JSX, which suits scenes where little changes per
+frame. Here dozens of ships, projectiles and effects move every frame: driving them through React
+would mean a reconciliation pass per frame, or bypassing React through refs — losing the benefit
+while keeping the cost. An explicit class also makes the lifecycle the brief asks for (releasing
+the ticker, listeners and textures; surviving Strict Mode) a single, testable `destroy()` instead of
+behaviour hidden inside a library. The trade-off is writing the entity → sprite mapping by hand.
 
 ## Simulation loop
 
