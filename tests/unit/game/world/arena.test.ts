@@ -58,7 +58,7 @@ describe('resolveCircleAgainstArena', () => {
     const center = vec(390, 250)
 
     expect(resolveCircleAgainstArena(arena, center, 20)).toBe(true)
-    expect(center.x).toBeCloseTo(380, 6)
+    expect(center.x).toBeCloseTo(380, 4)
     expect(center.y).toBe(250)
   })
 
@@ -79,8 +79,8 @@ describe('resolveCircleAgainstArena', () => {
     resolveCircleAgainstArena(arena, center, 20)
 
     expect(circleHitsLand(arena, center, 20)).toBe(false)
-    expect(center.x).toBeCloseTo(520, 6)
-    expect(center.y).toBeCloseTo(420, 6)
+    expect(center.x).toBeCloseTo(520, 4)
+    expect(center.y).toBeCloseTo(420, 4)
   })
 
   it('escapes a tile it ended up inside of', () => {

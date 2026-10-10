@@ -126,6 +126,11 @@ function closestDistanceSq(center: Vec2, left: number, top: number, size: number
   return (center.x - nearestX) ** 2 + (center.y - nearestY) ** 2
 }
 
+// Pushed circles end this far outside the tile instead of exactly tangent:
+// floating-point rounding would otherwise leave some a hair inside, and the
+// next overlap test would count that as touching land.
+const SKIN = 1e-6
+
 function pushOutOfTile(center: Vec2, radius: number, left: number, top: number, size: number): boolean {
   const nearestX = clamp(center.x, left, left + size)
   const nearestY = clamp(center.y, top, top + size)
@@ -136,7 +141,7 @@ function pushOutOfTile(center: Vec2, radius: number, left: number, top: number, 
 
   if (distSq > 0) {
     const dist = Math.sqrt(distSq)
-    const push = radius - dist
+    const push = radius - dist + SKIN
     center.x += (dx / dist) * push
     center.y += (dy / dist) * push
     return true
@@ -145,10 +150,10 @@ function pushOutOfTile(center: Vec2, radius: number, left: number, top: number, 
   // Centre inside the tile (only after a teleport or a huge step): leave by
   // the nearest edge.
   const exits = [
-    { d: center.x - left, x: left - radius, y: center.y },
-    { d: left + size - center.x, x: left + size + radius, y: center.y },
-    { d: center.y - top, x: center.x, y: top - radius },
-    { d: top + size - center.y, x: center.x, y: top + size + radius },
+    { d: center.x - left, x: left - radius - SKIN, y: center.y },
+    { d: left + size - center.x, x: left + size + radius + SKIN, y: center.y },
+    { d: center.y - top, x: center.x, y: top - radius - SKIN },
+    { d: top + size - center.y, x: center.x, y: top + size + radius + SKIN },
   ]
   const nearest = exits.reduce((best, exit) => (exit.d < best.d ? exit : best))
   center.x = nearest.x
