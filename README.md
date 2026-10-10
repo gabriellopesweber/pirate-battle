@@ -49,6 +49,21 @@ Optionally copy `.env.example` to `.env` — the defaults work out of the box.
 | `pnpm test:e2e:report` | Open the last HTML report |
 | `pnpm check` | lint + typecheck + unit + build |
 
+## Controls
+
+| Action | Keyboard | Touch |
+|---|---|---|
+| Sail forward | `W` / `↑` | forward button |
+| Turn left / right | `A` / `←`, `D` / `→` | turn buttons |
+| Fire bow cannon | `Space` | bow-cannon button |
+| Fire port / starboard broadside | `Q` / `E` | broadside buttons |
+| Pause | `P` / `Esc` | Pause button |
+| Restart | `R` | Restart button |
+
+Moving and firing work together. Game keys are only captured while a match is running; the
+match also pauses on its own when the window loses focus or the tab is hidden. Touch buttons show
+on touch screens; keyboard controls are listed on screen.
+
 ## Gameplay configuration
 
 All balancing numbers live in [`src/game/config/gameConfig.ts`](src/game/config/gameConfig.ts).

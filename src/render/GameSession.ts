@@ -2,8 +2,9 @@ import { Application, Container, type Ticker } from 'pixi.js'
 import type { GameConfig } from '@/game/config/gameConfig'
 import { FixedStepLoop } from '@/game/core/fixedStepLoop'
 import { Match, type MatchResult, type PauseReason } from '@/game/match/match'
-import { IDLE_PLAYER_INPUT, type PlayerInput } from '@/game/world/state'
 import { watchFocusLoss } from '@/input/autoPause'
+import { InputState } from '@/input/inputState'
+import { bindKeyboard } from '@/input/keyboard'
 import type { GameAssets } from '@/render/assets'
 import { createHudStore, type HudSnapshot, type HudStore } from '@/render/hudStore'
 import { Scene } from '@/render/scene'
@@ -13,14 +14,20 @@ export interface GameSessionOptions {
   assets: GameAssets
   config: Readonly<GameConfig>
   seed: number
-  /** Reads the player's intent once per simulation step. */
-  readInput?: () => PlayerInput
+  /** Shared with on-screen touch controls; the session adds the keyboard. */
+  input?: InputState
   onEnd?: (result: MatchResult) => void
+  /** The restart key was pressed; the owner starts a new match. */
+  onRestart?: () => void
 }
 
 /**
  * Owns one match on screen: the Pixi application, the fixed-step loop, the
- * scene, auto-pause and the HUD store.
+ * scene, keyboard input, auto-pause and the HUD store.
+ *
+ * The keyboard is bound only while the match is running. Pausing or ending
+ * unbinds it and drops everything held, so keys never reach the game from a
+ * menu or dialog, and nothing pressed during a pause acts on resume.
  *
  * React creates it with `GameSession.create` and calls `destroy` on unmount.
  * `destroy` is idempotent and also cancels a start still in flight, which is
@@ -32,7 +39,9 @@ export class GameSession {
   private readonly options: GameSessionOptions
   private readonly app = new Application()
   private readonly world = new Container({ label: 'world' })
+  readonly input: InputState
   private readonly loop: FixedStepLoop
+  private stopKeyboard: (() => void) | null = null
   private scene: Scene | null = null
   private stopFocusWatch: (() => void) | null = null
   private lastSize = { width: 0, height: 0 }
@@ -42,13 +51,14 @@ export class GameSession {
 
   private constructor(options: GameSessionOptions) {
     this.options = options
+    this.input = options.input ?? new InputState()
     this.match = new Match(options.config, options.seed)
     this.hud = createHudStore(this.snapshot())
     this.loop = new FixedStepLoop({
       stepSeconds: options.config.simulation.stepSeconds,
       maxStepsPerFrame: options.config.simulation.maxStepsPerFrame,
       step: (dt) => {
-        this.match.step(this.options.readInput?.() ?? IDLE_PLAYER_INPUT, dt)
+        this.match.step(this.input.read(), dt)
         this.scene?.handleEvents(this.match.world.events)
       },
     })
@@ -70,14 +80,20 @@ export class GameSession {
 
   pause(reason: PauseReason): void {
     this.match.pause(reason)
-    if (this.match.status === 'paused') this.loop.pause()
+    if (this.match.status === 'paused') {
+      this.loop.pause()
+      this.releaseControls()
+    }
     this.publishHud()
   }
 
   resume(): void {
     this.match.resume()
     // The loop resumes without catching up on the time spent paused.
-    if (this.match.status === 'running') this.loop.resume()
+    if (this.match.status === 'running') {
+      this.loop.resume()
+      this.bindControls()
+    }
     this.publishHud()
   }
 
@@ -97,6 +113,7 @@ export class GameSession {
     this.destroyed = true
     this.stopFocusWatch?.()
     this.stopFocusWatch = null
+    this.releaseControls()
     // Pixi cannot be torn down mid-init; init() does it once ready.
     if (this.started) this.teardown()
   }
@@ -135,7 +152,26 @@ export class GameSession {
     this.stopFocusWatch = watchFocusLoss({ window, document }, () => {
       this.pause('focus-lost')
     })
+    this.bindControls()
     this.app.ticker.add(this.tick)
+  }
+
+  private bindControls(): void {
+    if (this.stopKeyboard || this.destroyed) return
+    this.stopKeyboard = bindKeyboard(window, this.input, {
+      onPause: () => {
+        this.pause('manual')
+      },
+      onRestart: () => {
+        this.options.onRestart?.()
+      },
+    })
+  }
+
+  private releaseControls(): void {
+    this.stopKeyboard?.()
+    this.stopKeyboard = null
+    this.input.reset()
   }
 
   private readonly tick = (ticker: Ticker): void => {
@@ -153,6 +189,7 @@ export class GameSession {
     const { result } = this.match
     if (result && !this.endReported) {
       this.endReported = true
+      this.releaseControls()
       this.options.onEnd?.(result)
     }
   }

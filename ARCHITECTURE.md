@@ -245,6 +245,26 @@ counts score from `destroyed` events whose cause is `player-fire`. A kill is **o
 cannot be counted twice, and a Chaser exploding on the player (`ram`) is distinguishable from a
 kill and does not score.
 
+## Input
+
+`InputState` (`src/input/inputState.ts`) holds what the player is pressing and is read once per
+simulation step. Each action counts its holders, so a key and a finger on the same action do not
+cancel each other when one lets go.
+
+- **Keyboard** (`keyboard.ts`) maps physical keys (`KeyboardEvent.code`, so WASD works on any
+  layout). The session binds it **only while the match is running**: pausing or ending unbinds it
+  and resets the input state, so keys never reach the game from a menu or dialog and nothing held
+  during a pause acts on resume. Bound keys do not scroll the page; keys typed into a form field
+  are ignored. `P`/`Esc` pause, `R` restarts.
+- **Touch** (`TouchControls.tsx`): HTML buttons drawn with the provided atlas sprites (round button
+  and icons, laid out as the atlas metadata says) through CSS on the same atlas image Pixi already
+  loaded. Each button captures its own pointer, so one thumb steers while the other fires. Shown
+  on coarse pointers, and only while the match is running.
+- The controls legend is generated from the same bindings the keyboard uses.
+
+**Restart** creates a new session with a fresh seed: React's effect cleanup destroys the previous
+one through the same teardown Strict Mode exercises, so nothing of the old match survives.
+
 ## Rendering
 
 `Scene` (`src/render/scene.ts`) decides nothing. Every frame it maps the world to views — a

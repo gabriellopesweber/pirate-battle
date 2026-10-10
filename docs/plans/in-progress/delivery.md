@@ -66,8 +66,10 @@ Priority is **consequence, not effort** — "what happens to the evaluation if t
   layout changed to islands within 3 × 3 tiles, each drawn as the whole stretched artwork, because
   tile-by-tile islands showed seams; no render interpolation; a temporary HUD until the screens
   (#11). Wiring auto-pause to the browser landed here as planned in #8 · **#9**
-- [ ] **Input** — keyboard and touch, simultaneous move + fire, captured only during gameplay,
-  no input accumulated while paused · **#10**
+- [x] **Input** — `InputState` with per-action holder counts; keyboard bound only while running
+  (unbound and reset on pause/end), touch buttons from the atlas sprites with per-button pointer
+  capture, controls legend from the same bindings. Added at his request: `R` and a Restart button,
+  each starting a fresh session (the brief's "restart creates a new match") · **#10**
 - [ ] **React screens** — main menu (Play, Options, controls, tabs), Options with validation and
   persistence, game screen with HUD and pause dialog, result screen with last result persisted ·
   **#11**

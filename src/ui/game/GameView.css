@@ -30,3 +30,19 @@
   background: rgb(0 0 0 / 0.45);
   font-variant-numeric: tabular-nums;
 }
+
+.game-view__legend {
+  position: absolute;
+  left: 0.5rem;
+  bottom: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  background: rgb(0 0 0 / 0.45);
+}
+
+/* On touch screens the on-screen buttons take this corner. */
+@media (pointer: coarse) {
+  .game-view__legend {
+    display: none;
+  }
+}
