@@ -99,7 +99,27 @@ collide, deal damage or fire later in the same step — and physically removed o
 
 ## Collisions
 
-_Written with the player ship and projectiles._
+### Ships against land and the arena edge
+
+The provided island art is built from 64 × 64 sand tiles, so the arena is a **tile grid**: each
+island is authored as a union of tile rectangles in `GameConfig.arena` and rasterised once into a
+land mask (`src/game/world/arena.ts`). The renderer draws the same mask, so what the player sees
+blocking a ship is exactly what blocks it.
+
+Ships are circles. After each move, `resolveCircleAgainstArena` pushes the circle out of every
+overlapping land tile along the line from the tile's closest point to the circle's centre — which
+lets ships **slide along a coastline** instead of sticking — then clamps it inside the arena. Two
+passes settle inner corners where two tiles push at once.
+
+Speed only drops on a **stall** (less than 25% of the intended travel achieved, i.e. ramming land
+nearly head-on). Scaling speed on every contact would compound step after step and glue a ship
+that merely grazes a coast.
+
+**No tunnelling:** the fastest ship moves under 3 units per 1/60 s step against a 64-unit tile, so
+a ship can never skip over land in one step.
+
+Movement is shared: `moveShip` takes `ShipControls` (thrust, turn), produced by player input or by
+enemy AI. Ships only move forward, as the brief specifies.
 
 ## Resource management
 

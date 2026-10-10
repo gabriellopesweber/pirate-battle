@@ -38,8 +38,10 @@ Priority is **consequence, not effort** — "what happens to the evaluation if t
   per-match snapshot; option limits (60–180 s, 1–10 s); fixed-timestep loop with step cap,
   pause without catch-up and manual stepping; seeded RNG; entity stores with deferred removal.
   Vector math deferred to #5, where movement first needs it · **#4**
-- [ ] **Player ship** — forward movement, rotation both ways, arena bounds, island collision ·
-  **#5**
+- [x] **Player ship** — forward movement with acceleration, rotation both ways, arena bounds,
+  island collision against a tile-grid land mask with sliding along coasts; speed drops only on a
+  stall. Movement is shared with enemies through `ShipControls`. Arena layout moved into
+  `GameConfig.arena` (tiles, islands, player spawn) · **#5**
 - [ ] **Weapons and projectiles** — front shot, left/right broadside (3 parallel), per-weapon
   cooldown, speed, damage applied once, lifetime/range, removal on hit/obstacle/exit · **#6**
 - [ ] **Enemies and spawner** — Chaser (pursue, ram, explode, no score), Shooter (approach, fire in
