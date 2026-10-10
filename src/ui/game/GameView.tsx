@@ -3,44 +3,42 @@ import type { GameConfig } from '@/game/config/gameConfig'
 import { randomSeed } from '@/game/core/rng'
 import type { MatchResult } from '@/game/match/match'
 import { InputState } from '@/input/inputState'
-import type { GameAssets } from '@/render/assets'
 import { GameSession } from '@/render/GameSession'
+import { useAssets } from '@/ui/assets/AssetsContext'
 import { ControlsLegend } from '@/ui/game/ControlsLegend'
+import { Hud } from '@/ui/game/Hud'
 import { TouchControls } from '@/ui/game/TouchControls'
 import { useHud } from '@/ui/game/useHud'
 import './GameView.css'
 
 interface GameViewProps {
-  assets: GameAssets
   config: Readonly<GameConfig>
-  seed: number
-  onEnd?: (result: MatchResult) => void
+  onEnd: (result: MatchResult) => void
+  onMainMenu: () => void
 }
 
 /**
- * Mounts one game session into a container and tears it down on unmount.
- * React renders this component when the HUD changes — never per frame.
+ * The combat screen: mounts one game session and tears it down on unmount,
+ * so leaving the screen abandons the match. React renders this component
+ * when the HUD changes — never per frame.
  *
  * Restarting starts a new session with a fresh seed: the effect cleanup
  * destroys the old one, so nothing of the previous match carries over.
  */
-export function GameView({ assets, config, seed: firstSeed, onEnd }: GameViewProps) {
-  const [seed, setSeed] = useState(firstSeed)
+export function GameView({ config, onEnd, onMainMenu }: GameViewProps) {
+  const assets = useAssets()
+  const [seed, setSeed] = useState(randomSeed)
   const restart = () => {
     setSeed(randomSeed())
   }
-  const latestRestart = useRef(restart)
-  useEffect(() => {
-    latestRestart.current = restart
-  })
   const container = useRef<HTMLDivElement>(null)
   const [session, setSession] = useState<GameSession | null>(null)
   // One input state per mount, shared by the keyboard (inside the session) and the touch controls.
   const [input] = useState(() => new InputState())
-  // The callback changes identity on every parent render; the session reads the latest.
-  const latestOnEnd = useRef(onEnd)
+  // Callbacks change identity on every render; the session reads the latest.
+  const latest = useRef({ onEnd, restart })
   useEffect(() => {
-    latestOnEnd.current = onEnd
+    latest.current = { onEnd, restart }
   })
 
   useEffect(() => {
@@ -53,10 +51,10 @@ export function GameView({ assets, config, seed: firstSeed, onEnd }: GameViewPro
       seed,
       input,
       onEnd: (result) => {
-        latestOnEnd.current?.(result)
+        latest.current.onEnd(result)
       },
       onRestart: () => {
-        latestRestart.current()
+        latest.current.restart()
       },
     })
     setSession(created)
@@ -69,55 +67,27 @@ export function GameView({ assets, config, seed: firstSeed, onEnd }: GameViewPro
   return (
     <div className="game-view">
       <div ref={container} className="game-view__canvas" />
-      {session && <Hud session={session} assets={assets} onRestart={restart} />}
+      {session && <Overlay session={session} onRestart={restart} onMainMenu={onMainMenu} />}
     </div>
   )
 }
 
-/** Temporary HUD; the full one, with the UI atlas and accessible status, comes with the screens (#11). */
-function Hud({ session, assets, onRestart }: { session: GameSession; assets: GameAssets; onRestart: () => void }) {
-  const hud = useHud(session.hud)
-  const minutes = Math.floor(hud.secondsLeft / 60)
-  const seconds = String(hud.secondsLeft % 60).padStart(2, '0')
+interface OverlayProps {
+  session: GameSession
+  onRestart: () => void
+  onMainMenu: () => void
+}
+
+function Overlay({ session, onRestart, onMainMenu }: OverlayProps) {
+  const { status } = useHud(session.hud)
+  const { ui } = useAssets()
   return (
     <>
-      <div className="game-view__hud">
-        <span>
-          Health {hud.health}/{hud.maxHealth}
-        </span>
-        <span>Score {hud.score}</span>
-        <span>
-          Time {minutes}:{seconds}
-        </span>
-        {hud.status === 'running' && (
-          <button
-            type="button"
-            onClick={() => {
-              session.pause('manual')
-            }}
-          >
-            Pause
-          </button>
-        )}
-        {hud.status === 'paused' && (
-          <button
-            type="button"
-            onClick={() => {
-              session.resume()
-            }}
-          >
-            Resume
-          </button>
-        )}
-        {hud.status === 'ended' && <span>Match over ({hud.endReason})</span>}
-        <button type="button" onClick={onRestart}>
-          Restart
-        </button>
-      </div>
+      <Hud session={session} onRestart={onRestart} onMainMenu={onMainMenu} />
       <div className="game-view__legend">
         <ControlsLegend />
       </div>
-      {hud.status === 'running' && <TouchControls input={session.input} ui={assets.ui} />}
+      {status === 'running' && <TouchControls input={session.input} ui={ui} />}
     </>
   )
 }

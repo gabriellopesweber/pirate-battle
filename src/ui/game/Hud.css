@@ -1,0 +1,88 @@
+.hud {
+  position: absolute;
+  inset: 0 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: max(0.5rem, env(safe-area-inset-top)) max(0.5rem, env(safe-area-inset-right)) 0
+    max(0.5rem, env(safe-area-inset-left));
+  pointer-events: none;
+}
+
+.hud button {
+  pointer-events: auto;
+}
+
+.hud__health {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* health_frame is 256 × 48; its fill_rect spans 30–226 px horizontally (11.7 %–88.3 %). */
+.hud__bar {
+  position: relative;
+  width: 12rem;
+  aspect-ratio: 256 / 48;
+  background: center / 100% 100% no-repeat;
+}
+
+.hud__bar-fill {
+  position: absolute;
+  inset: 0;
+  background: center / 100% 100% no-repeat;
+}
+
+.hud__bar-text {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.8);
+}
+
+.hud__right {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/* counter_panel is 160 × 56. */
+.hud__counter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  width: 6.5rem;
+  aspect-ratio: 160 / 56;
+  background: center / 100% 100% no-repeat;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.hud__overlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgb(0 0 0 / 0.35);
+}
+
+.hud__dialog {
+  min-width: min(22rem, 90vw);
+}
+
+@media (max-width: 40rem) {
+  .hud__bar {
+    width: 8rem;
+  }
+
+  .hud__counter {
+    width: 5rem;
+    font-size: 0.85rem;
+  }
+}

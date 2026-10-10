@@ -1,11 +1,11 @@
 import { expect, test } from '@playwright/test'
+import { openMenu } from './helpers'
 
 const SHIPS_IMAGE = '**/game/ships.png'
+const playButton = { name: 'Play' }
 
-test('loads the game assets', async ({ page }) => {
-  await page.goto('/')
-
-  await expect(page.locator('canvas')).toBeVisible()
+test('loads the game assets before showing the menu', async ({ page }) => {
+  await openMenu(page)
 })
 
 test('shows progress while the assets are loading', async ({ page }) => {
@@ -21,8 +21,9 @@ test('shows progress while the assets are loading', async ({ page }) => {
   await page.goto('/')
 
   await expect(page.getByRole('progressbar', { name: 'Loading the fleet…' })).toBeVisible()
+  await expect(page.getByRole('button', playButton)).toBeHidden()
   release()
-  await expect(page.locator('canvas')).toBeVisible()
+  await expect(page.getByRole('button', playButton)).toBeVisible({ timeout: 15_000 })
 })
 
 test('reports a failed load and recovers on retry', async ({ page }) => {
@@ -38,5 +39,5 @@ test('reports a failed load and recovers on retry', async ({ page }) => {
   await page.unroute(SHIPS_IMAGE)
   await retry.click()
 
-  await expect(page.locator('canvas')).toBeVisible()
+  await expect(page.getByRole('button', playButton)).toBeVisible({ timeout: 15_000 })
 })
