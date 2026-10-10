@@ -187,6 +187,31 @@ After 40 rejected candidates the spawn is skipped until the next interval; the c
 shortened to make up for it. The **first two spawns are one Chaser and one Shooter**, so both
 types appear in every match whatever the weights; later spawns follow `spawn.weights`.
 
+## Match rules
+
+`Match` (`src/game/match/match.ts`) wraps one `World` with the rules of a match: status
+(`running` → `paused` ⇄ `running` → `ended`), score and result. Its `step` is the only thing that
+advances the world, and it does nothing unless the match is running:
+
+- **Pause freezes everything at once.** There is no separate timer to stop: the countdown is
+  world time, cooldowns and spawns count down inside steps, so a paused match skips all of them
+  together. Resuming is only ever an explicit player action (`resume()`); a manual pause is not
+  overwritten by a later focus loss.
+- **Score** is read from the step's events: one point per `destroyed` enemy whose cause is
+  `player-fire`. A Chaser's `ram` scores nothing, and a kill cannot be counted twice.
+- **End** comes when world time reaches the configured duration (`time-up`) or the player sinks
+  (`destroyed`). Events after the player's destruction in the same step are not counted. After
+  the end, steps are ignored — nothing moves, fires, takes damage, spawns or scores.
+- **Result** records score, active play time, reason, seed and the config snapshot. A `time-up`
+  match lasted exactly its duration: summing 1/60 s steps drifts (3600 steps add up to
+  59.99999999…), so the duration is stored as configured, and other ends to the millisecond.
+- **Restart** creates a new `Match` — a fresh world, nothing carried over.
+
+`watchFocusLoss` (`src/input/autoPause.ts`) reports a window blur or a hidden tab; the game
+session turns that into `pause('focus-lost')`. It only pauses — a match never resumes on its own.
+
+## Simulation events
+
 Each step produces a list of `GameEvent`s — `shot`, `hit`, `splash`, `destroyed` — cleared at the
 start of the next step. They are the only channel from the rules to everything else: the renderer
 turns them into muzzle flashes, impacts and explosions, sound plays from them, and the match
