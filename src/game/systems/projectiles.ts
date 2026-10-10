@@ -3,7 +3,7 @@ import type { Projectile } from '@/game/entities/projectile'
 import type { Ship } from '@/game/entities/ship'
 import { damageShip } from '@/game/systems/combat'
 import { circleHitsLand } from '@/game/world/arena'
-import type { World } from '@/game/world/world'
+import type { World } from '@/game/world/state'
 
 /**
  * Moves every projectile one step and resolves what it touches, in order:

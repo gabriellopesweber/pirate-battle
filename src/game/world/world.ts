@@ -1,55 +1,14 @@
 import type { GameConfig } from '@/game/config/gameConfig'
-import { createIdAllocator, type EntityId, EntityStore } from '@/game/core/entityStore'
-import { createRng, type Rng } from '@/game/core/rng'
+import { createIdAllocator, EntityStore } from '@/game/core/entityStore'
+import { createRng } from '@/game/core/rng'
 import type { Projectile } from '@/game/entities/projectile'
-import { createShip, type Ship, type ShipControls } from '@/game/entities/ship'
+import { createShip, type Ship } from '@/game/entities/ship'
+import { readyCooldown, tickCooldown } from '@/game/systems/cooldown'
 import { moveShip } from '@/game/systems/movement'
 import { updateProjectiles } from '@/game/systems/projectiles'
-import {
-  broadsideOffsets,
-  type Cooldown,
-  fireVolley,
-  readyCooldown,
-  tickCooldown,
-} from '@/game/systems/weapons'
-import { type Arena, circleIsClear, createArena } from '@/game/world/arena'
-import type { GameEvent } from '@/game/world/events'
-
-/** Everything the rules need for one match. Plain data, no rendering. */
-export interface World {
-  readonly config: Readonly<GameConfig>
-  readonly arena: Arena
-  readonly rng: Rng
-  readonly nextId: () => EntityId
-  readonly player: Ship
-  /** Front cannon and each broadside fire independently. */
-  readonly playerWeapons: { front: Cooldown; left: Cooldown; right: Cooldown }
-  readonly enemies: EntityStore<Ship>
-  readonly projectiles: EntityStore<Projectile>
-  /** Events of the last step only; cleared at the start of each step. */
-  events: GameEvent[]
-  /** Simulation time elapsed in this match. */
-  time: number
-}
-
-/** The player's intent for one step. Fire buttons repeat while held, at each weapon's cooldown. */
-export interface PlayerInput extends ShipControls {
-  fireFront: boolean
-  fireLeft: boolean
-  fireRight: boolean
-}
-
-export const IDLE_PLAYER_INPUT: Readonly<PlayerInput> = Object.freeze({
-  thrust: false,
-  turn: 0,
-  fireFront: false,
-  fireLeft: false,
-  fireRight: false,
-})
-
-export interface StepInput {
-  player: PlayerInput
-}
+import { broadsideOffsets, fireVolley } from '@/game/systems/weapons'
+import { circleIsClear, createArena } from '@/game/world/arena'
+import type { PlayerInput, StepInput, World } from '@/game/world/state'
 
 export function createWorld(config: Readonly<GameConfig>, seed: number): World {
   const arena = createArena(config.arena)

@@ -40,6 +40,12 @@ tests/
 Dependency direction: `ui → app → render / input → game`. `game/` imports nothing from React or
 Pixi, which is what lets it run under Vitest without a canvas.
 
+Inside `game/`, the match state types (`World`, `PlayerInput`) live in `world/state.ts`, apart from
+`world/world.ts`, which builds and steps the world. Systems import the types from `state.ts`;
+`world.ts` imports the systems. Keeping the types in `world.ts` created import cycles
+(`world → projectiles → world`) that the compiler tolerates but editors resolve as half-built
+types while files change. There are no import cycles in `src/`.
+
 ## React ↔ PixiJS integration
 
 A `GameSession` class owns the Pixi `Application`, the ticker, input listeners and the simulation.

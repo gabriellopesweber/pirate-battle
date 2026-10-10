@@ -3,7 +3,8 @@ import { DEFAULT_GAME_CONFIG } from '@/game/config/gameConfig'
 import type { Vec2 } from '@/game/core/vector'
 import { createShip } from '@/game/entities/ship'
 import type { GameEvent } from '@/game/world/events'
-import { createWorld, IDLE_PLAYER_INPUT, type PlayerInput, stepWorld, type World } from '@/game/world/world'
+import { IDLE_PLAYER_INPUT, type PlayerInput, type World } from '@/game/world/state'
+import { createWorld, stepWorld } from '@/game/world/world'
 
 const config = DEFAULT_GAME_CONFIG
 const DT = config.simulation.stepSeconds

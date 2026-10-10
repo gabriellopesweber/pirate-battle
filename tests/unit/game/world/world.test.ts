@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { DEFAULT_GAME_CONFIG } from '@/game/config/gameConfig'
 import { circleHitsLand } from '@/game/world/arena'
-import { createWorld, IDLE_PLAYER_INPUT, stepWorld } from '@/game/world/world'
+import { IDLE_PLAYER_INPUT } from '@/game/world/state'
+import { createWorld, stepWorld } from '@/game/world/world'
 
 describe('world', () => {
   it('starts the player at the configured spawn with full health', () => {

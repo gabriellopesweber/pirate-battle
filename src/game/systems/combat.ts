@@ -1,6 +1,6 @@
 import type { Ship } from '@/game/entities/ship'
 import type { DestroyCause } from '@/game/world/events'
-import type { World } from '@/game/world/world'
+import type { World } from '@/game/world/state'
 
 /**
  * Applies damage to a ship and destroys it at zero health.

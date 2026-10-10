@@ -1,25 +1,9 @@
 import type { WeaponStats } from '@/game/config/gameConfig'
 import type { Side } from '@/game/entities/projectile'
 import type { Ship } from '@/game/entities/ship'
+import { type Cooldown, isReady } from '@/game/systems/cooldown'
 import type { WeaponKind } from '@/game/world/events'
-import type { World } from '@/game/world/world'
-
-// Float drift tolerance when a cooldown counts down in 1/60 s steps.
-const EPSILON = 1e-9
-
-/** Seconds until a weapon can fire again; 0 means ready. */
-export interface Cooldown {
-  remaining: number
-}
-
-export const readyCooldown = (): Cooldown => ({ remaining: 0 })
-
-/** Counts a cooldown down by one step. */
-export function tickCooldown(cooldown: Cooldown, dt: number): void {
-  cooldown.remaining = Math.max(0, cooldown.remaining - dt)
-}
-
-export const isReady = (cooldown: Cooldown): boolean => cooldown.remaining <= EPSILON
+import type { World } from '@/game/world/state'
 
 /**
  * Fires a volley if the weapon is ready and restarts its cooldown.
