@@ -54,8 +54,11 @@ Priority is **consequence, not effort** — "what happens to the evaluation if t
   probe-based land avoidance that commits to a detour (an uncommitted version got Chasers pinned
   against coasts). Spawner: interval, alive cap, seeded safe points; the first two spawns are one
   of each type so both always appear · **#7**
-- [ ] **Match rules** — timer (60–180 s), score, end by time or death, everything stops at the end,
-  clean restart, manual pause and auto-pause on blur/hidden with explicit resume · **#8**
+- [x] **Match rules** — `Match` over the world: countdown, score from `player-fire` kills, end by
+  time or by sinking, every system frozen after the end and while paused, explicit resume, restart
+  as a new match. Time-up results store the exact duration (summed steps drift). Focus-loss
+  detection is a DOM-free module; wiring it to the browser lands with the game session (#9) ·
+  **#8**
 - [ ] **Pixi renderer** — water/islands, ships with damage states, health bars above ships, muzzle
   flash, impacts, explosions; DPR-aware resize with letterboxing · **#9**
 - [ ] **Input** — keyboard and touch, simultaneous move + fire, captured only during gameplay,
