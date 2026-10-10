@@ -1,0 +1,25 @@
+:root {
+  color-scheme: dark;
+  --color-sea: #0b3b5a;
+  --color-ink: #f4ead5;
+  --font-body: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--color-sea);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+}

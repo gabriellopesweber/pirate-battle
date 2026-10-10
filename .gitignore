@@ -1,0 +1,20 @@
+node_modules
+dist
+*.local
+.env
+.env.*
+!.env.example
+
+# Playwright — reports are attached as CI artifacts, baselines are versioned
+test-results
+playwright-report
+blob-report
+playwright/.cache
+
+# Editors / OS
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+Thumbs.db
+*.log
