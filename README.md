@@ -37,7 +37,8 @@ Optionally copy `.env.example` to `.env` — the defaults work out of the box.
 
 | Command | What it does |
 |---|---|
-| `pnpm dev` | Development server |
+| `pnpm dev` | Generate runtime assets, then start the development server |
+| `pnpm assets` | Regenerate `public/game/` from `assets/` (run by `dev` and `build`) |
 | `pnpm build` | Type-check and production build |
 | `pnpm preview` | Serve the production build |
 | `pnpm lint` | ESLint |

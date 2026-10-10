@@ -123,7 +123,30 @@ enemy AI. Ships only move forward, as the brief specifies.
 
 ## Resource management
 
-_Written with the asset pipeline and renderer._
+### Asset pipeline
+
+`assets/` keeps the provided art and sound unmodified; `scripts/build-assets.ts` derives the
+runtime files into `public/game/` before every `dev` and `build` (the output is git-ignored, so
+source and derived files never drift apart in version control). Provenance, what was left out and
+why each conversion exists are in [`assets/README.md`](assets/README.md). In short:
+
+- the ships atlas is a Starling XML that PixiJS cannot read — converted to a Pixi JSON atlas;
+- the provided ships "retina" sheet is not actually 2× — ships always load at 1×, or they would be
+  drawn at half size on dense screens;
+- the tilesheet is a bare 64-unit grid — turned into an atlas with one frame per cell, at 1× and 2×.
+
+### Loading, failure and retry
+
+`loadGameAssets` (`src/render/assets.ts`) loads three atlases — ships, tiles, UI — choosing 2× tiles
+and UI when `devicePixelRatio > 1.25`. Textures are loaded **once** and reused by every match.
+
+`AssetGate` keeps combat behind the load: a labelled progress bar while loading, an alert with a
+focused **Retry** button on failure. Retrying only re-fetches what failed: PixiJS caches successful
+loads and drops failed ones from its cache.
+
+Once an attempt settles, late progress events are ignored. Without that, files still downloading
+after another one failed kept reporting progress and flipped the error back to "loading", hiding
+Retry — caught by the E2E test that aborts the ships image.
 
 ## Local persistence
 

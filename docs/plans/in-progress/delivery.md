@@ -32,8 +32,12 @@ Priority is **consequence, not effort** — "what happens to the evaluation if t
   integration (production from `main`, previews on PRs — previews sit behind Vercel's login, so
   production is the only public URL). Live at https://gabriellopesweber-pirate-battle.vercel.app.
   Smoke E2E guards render and SPA fallback · **#2** (PR #21)
-- [ ] **Asset pipeline** — copy the provided assets, convert the ships XML atlas to Pixi JSON,
-  load with visible progress, failure state and retry before combat starts · **#3**
+- [x] **Asset pipeline** — provided assets kept unmodified in `assets/` (unused individual PNGs,
+  vector sources and reference images left out, documented); build script converts the ships XML,
+  grids the tilesheet and copies UI and sounds into a git-ignored `public/game/`; progress bar,
+  accessible error and retry. Ships stay 1× because the provided "retina" ships sheet is not 2×.
+  Failure is tested by aborting the real request in Playwright instead of an in-app hook. The
+  gate sits on the home page until the screen flow (#11) moves it in front of combat · **#3**
 - [x] **Gameplay config and simulation core** — typed, centralised config with a deep-frozen
   per-match snapshot; option limits (60–180 s, 1–10 s); fixed-timestep loop with step cap,
   pause without catch-up and manual stepping; seeded RNG; entity stores with deferred removal.
@@ -80,6 +84,11 @@ Priority is **consequence, not effort** — "what happens to the evaluation if t
 - [ ] **Sound** — effects and ambience loops from the provided WAVs, mute toggle · **#19**
 - [ ] **Performance report** — FPS, p95 frame time and entity count over a 3-minute match;
   memory over 5 start/play/exit cycles; hardware and browser documented · **#20**
+
+## Found along the way
+
+- [ ] **CI once per change** — the `push: main` trigger re-ran the PR's checks after every merge
+  and on docs-only commits; the PR run already tests the merge result · **#24**
 
 ## Suggested sequence
 
