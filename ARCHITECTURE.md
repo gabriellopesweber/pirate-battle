@@ -262,8 +262,11 @@ cancel each other when one lets go.
   are ignored. `P`/`Esc` pause, `R` restarts.
 - **Touch** (`TouchControls.tsx`): HTML buttons drawn with the provided atlas sprites (round button
   and icons, laid out as the atlas metadata says) through CSS on the same atlas image Pixi already
-  loaded. Each button captures its own pointer, so one thumb steers while the other fires. Shown
-  on coarse pointers, and only while the match is running.
+  loaded. Laid out as two thumb clusters, as mobile games do: steering under the left thumb
+  (forward on top, a turn on each side below it), weapons under the right (bow cannon on top, a
+  broadside on each side). Each cluster is 168 px wide, so both fit a portrait phone. Each button
+  captures its own pointer, so one thumb steers while the other fires. Shown on coarse pointers,
+  and only while the match is running.
 - The controls legend is generated from the same bindings the keyboard uses.
 
 **Restart** creates a new session with a fresh seed: React's effect cleanup destroys the previous

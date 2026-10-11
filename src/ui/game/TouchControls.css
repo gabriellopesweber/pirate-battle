@@ -15,10 +15,33 @@
   }
 }
 
-.touch-controls__group {
-  display: flex;
-  gap: 0.5rem;
+/*
+ * A thumb cluster: one button on top, one on each side below it. The middle
+ * column is narrower than a button, so the top one sits centred between the
+ * two below and the cluster stays 168 px wide — two of them fit a 360 px
+ * portrait phone with room to spare.
+ */
+.touch-controls__cluster {
+  display: grid;
+  grid-template-areas:
+    '. top .'
+    'left . right';
+  grid-template-columns: 64px 40px 64px;
+  grid-template-rows: 64px 64px;
   pointer-events: auto;
+}
+
+.touch-controls__button--top {
+  grid-area: top;
+  justify-self: center;
+}
+
+.touch-controls__button--left {
+  grid-area: left;
+}
+
+.touch-controls__button--right {
+  grid-area: right;
 }
 
 .touch-controls__button {
