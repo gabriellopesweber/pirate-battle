@@ -9,16 +9,22 @@ interface QueryClientOptions {
   retryDelay?: number
 }
 
+const retry = (failureCount: number, error: unknown) => failureCount < MAX_RETRIES && isRetryable(error)
+
 export function createQueryClient({ retryDelay }: QueryClientOptions = {}): QueryClient {
+  const delay = retryDelay === undefined ? {} : { retryDelay }
   return new QueryClient({
     defaultOptions: {
       queries: {
-        retry: (failureCount, error) => failureCount < MAX_RETRIES && isRetryable(error),
-        ...(retryDelay === undefined ? {} : { retryDelay }),
+        retry,
+        ...delay,
         // Fresh for 30 s: switching pages back and forth reuses the cache;
         // reopening a tab refetches regardless (see queries.ts).
         staleTime: 30_000,
       },
+      // Registering a match is safe to repeat — the server keys it by match
+      // id — so mutations retry under the same policy as reads.
+      mutations: { retry, ...delay },
     },
   })
 }

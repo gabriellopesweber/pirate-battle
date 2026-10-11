@@ -29,6 +29,11 @@ export function setupMockApiServer(seed: () => MatchRecord[]) {
 
   return {
     server,
+    /** This test's db, to act as the server would behind a handler override. */
+    db: (): MockDb => {
+      if (!state.db) throw new Error('The mock db exists only inside a test')
+      return state.db
+    },
     /** Absolute URL of an endpoint, for overriding it with `server.use`. */
     url: (path: string) => `${apiBase}${path}`,
   }

@@ -1,10 +1,13 @@
 import { useState } from 'react'
+import { useRecoverPendingRegistrations, useRegisterMatch } from '@/api/registration'
+import { toMatchRecord } from '@/app/matchRecord'
 import { DEFAULT_GAME_CONFIG, type GameConfig } from '@/game/config/gameConfig'
 import { createMatchConfig } from '@/game/config/options'
 import type { MatchResult } from '@/game/match/match'
 import { loadLastResult, saveLastResult, type StoredResult } from '@/storage/lastResult'
 import { readJson, removeKey, session, writeJson } from '@/storage/local'
 import { loadOptions, saveOptions } from '@/storage/options'
+import { pendingMatches } from '@/storage/pendingMatches'
 import { loadPlayer } from '@/storage/player'
 import { AssetGate } from '@/ui/assets/AssetGate'
 import { AssetsContext } from '@/ui/assets/AssetsContext'
@@ -37,6 +40,9 @@ function initialScreen(): Screen {
 export function App() {
   const [screen, setScreen] = useState<Screen>(initialScreen)
   const [player] = useState(loadPlayer)
+  const register = useRegisterMatch()
+  // Matches left pending by a failure or a refresh are sent again on start.
+  useRecoverPendingRegistrations()
 
   const go = (next: Screen) => {
     if (next.name === 'result') writeJson(session, SCREEN_KEY, 'result')
@@ -52,12 +58,21 @@ export function App() {
     go({ name: 'game', config: createMatchConfig(DEFAULT_GAME_CONFIG, loadOptions()) })
   }
 
+  // Only a completed match gets here: leaving combat or refreshing abandons
+  // the match without a result, so it is never registered.
   const finish = (result: MatchResult) => {
+    const record = toMatchRecord(result, player, new Date())
+    // Queued before the first send, so nothing between here and a confirmed
+    // answer — failure, timeout, refresh — can lose it.
+    pendingMatches.add(record)
+    register.mutate(record)
+
     const stored: StoredResult = {
+      matchId: record.matchId,
       score: result.score,
       durationSeconds: result.durationSeconds,
       reason: result.reason,
-      endedAt: new Date().toISOString(),
+      endedAt: record.endedAt,
     }
     saveLastResult(stored)
     go({ name: 'result', result: stored })

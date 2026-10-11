@@ -89,8 +89,12 @@ Priority is **consequence, not effort** — "what happens to the evaluation if t
   match id. Late responses lose to newer data through a revision on every page. The local player
   gets a stable id and name. Built test-first; added component tests (jsdom + Testing Library) as
   a pyramid layer between unit and E2E · **#12**
-- [ ] **Match registration** — idempotent submit (client-generated match id), pending queue that
-  survives failures and refresh, retry, playable while pending · **#13**
+- [x] **Match registration** — client-generated match id; the server answers 201 for a new match
+  and 200 with the stored record for a resend, so every send is safe to repeat. The match is
+  queued in localStorage before its first send and leaves only on a confirmed answer; the app
+  resends pending matches on start; the result screen shows the status with Try again, also after
+  a refresh. Sent as a TanStack Query mutation that invalidates both tabs. A test covers the
+  stored-but-answer-lost case (two requests, one entry) · **#13**
 - [ ] **Network scenarios** — selectable, reproducible MSW scenarios (empty, paged, slow, jittered,
   out-of-order, timeout, 4xx/5xx, offline at match end) with reset; works on the deployed build ·
   **#14**
@@ -126,6 +130,9 @@ Priority is **consequence, not effort** — "what happens to the evaluation if t
 - [x] **Unit tests next to the code** — moved from the `tests/unit/` mirror into a `test/` folder
   beside each module, so moving or deleting a module shows its test in the same diff; the testing
   principles are written into `CONTRIBUTING.md` · **#37**
+- [x] **Spawner sweep timing out under load** — 30 seeds × 30 s of simulation took ~0.5 s alone
+  but once passed Vitest's 5 s default with the whole suite running; it got an explicit budget
+  with the reason beside it, the sweep unchanged · **#39**
 
 ## Suggested sequence
 

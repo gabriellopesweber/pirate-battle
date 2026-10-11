@@ -28,6 +28,28 @@ describe('createMockDb', () => {
     expect(db.ranking(DEFAULT_TEST_CONFIG, firstPage).items[0]?.matchId).toBe('mine')
   })
 
+  it('returns the existing record when the same match is registered again, without a duplicate', () => {
+    const db = setup().open()
+    const first = makeMatch({ matchId: 'mine', playerId: 'me', score: 7 })
+
+    expect(db.register(first)).toEqual({ record: first, created: true })
+    const again = db.register({ ...first, score: 99 })
+
+    expect(again).toEqual({ record: first, created: false })
+    expect(db.history('me', firstPage).items).toEqual([first])
+  })
+
+  it('does not raise the revision for a resent match, since nothing changed', () => {
+    const db = setup().open()
+    const match = makeMatch({ playerId: 'me' })
+    db.register(match)
+    const before = db.history('me', firstPage).revision
+
+    db.register(match)
+
+    expect(db.history('me', firstPage).revision).toBe(before)
+  })
+
   it('raises the revision on every registration', () => {
     const db = setup().open()
     const before = db.history('me', firstPage).revision

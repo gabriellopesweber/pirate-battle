@@ -3,6 +3,7 @@ import type { StoredResult } from '@/storage/lastResult'
 import { END_REASON_LABEL, formatClock } from '@/ui/format'
 import { MenuButton } from '@/ui/kit/MenuButton'
 import { Panel } from '@/ui/kit/Panel'
+import { RegistrationStatus } from '@/ui/result/RegistrationStatus'
 
 interface ResultScreenProps {
   result: StoredResult
@@ -38,8 +39,9 @@ export function ResultScreen({ result, onPlayAgain, onMainMenu }: ResultScreenPr
         </div>
         <div>
           <dt>Match record</dt>
-          {/* Registration with the ranking and history API arrives in #13. */}
-          <dd>Not sent</dd>
+          <dd>
+            <RegistrationStatus matchId={result.matchId} />
+          </dd>
         </div>
       </dl>
       <div className="button-stack">

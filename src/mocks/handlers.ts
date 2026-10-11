@@ -8,7 +8,7 @@ import type { MockDb } from '@/mocks/db'
  *
  *   GET  /ranking?sessionSeconds&spawnIntervalSeconds&page&pageSize
  *   GET  /players/:playerId/matches?page&pageSize
- *   POST /matches
+ *   POST /matches                     201 new · 200 already stored (same match id)
  */
 export function createHandlers(db: MockDb, apiBase: string) {
   const url = (path: string) => `${apiBase.replace(/\/$/, '')}${path}`
@@ -32,7 +32,9 @@ export function createHandlers(db: MockDb, apiBase: string) {
     http.post(url('/matches'), async ({ request }) => {
       const body: unknown = await request.json().catch(() => null)
       if (!isMatchRecord(body)) return badRequest('The body is not a valid match record.')
-      return HttpResponse.json(db.register(body), { status: 201 })
+      // Idempotent by match id: 201 when stored now, 200 with the stored record on a resend.
+      const { record, created } = db.register(body)
+      return HttpResponse.json(record, { status: created ? 201 : 200 })
     }),
   ]
 }
