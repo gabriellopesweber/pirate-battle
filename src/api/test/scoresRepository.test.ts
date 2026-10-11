@@ -74,6 +74,18 @@ describe('scoresRepository', () => {
     expect((ranking.data as Page<RankingEntry>).items[0]?.matchId).toBe('mine')
   })
 
+  it('answers a resent match with 200 and the stored record, keeping a single entry', async () => {
+    const mine = makeMatch({ matchId: 'mine', playerId: 'me' })
+    await repository.registerMatch(mine)
+
+    const resent = await repository.registerMatch({ ...mine, score: 99 })
+    const history = await repository.getHistory('me', { page: 1, pageSize: 5 }, signal)
+
+    expect(resent.status).toBe(200)
+    expect(resent.data).toEqual(mine)
+    expect((history.data as Page<MatchRecord>).items).toEqual([mine])
+  })
+
   it('returns an empty history page for a player with no matches', async () => {
     const { data } = await repository.getHistory('nobody', { page: 1, pageSize: 5 }, signal)
 

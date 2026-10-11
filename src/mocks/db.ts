@@ -10,7 +10,12 @@ import { readJson, writeJson } from '@/storage/local'
 export interface MockDb {
   ranking(config: MatchConfig, query: PageQuery): Page<RankingEntry>
   history(playerId: string, query: PageQuery): Page<MatchRecord>
-  register(record: MatchRecord): MatchRecord
+  /**
+   * Stores a match once. Registering a match id again returns the stored
+   * record untouched (`created: false`) — a resend after a lost response
+   * recovers the original instead of duplicating it.
+   */
+  register(record: MatchRecord): { record: MatchRecord; created: boolean }
   /** Back to the seed, discarding every registered match. */
   reset(): void
 }
@@ -50,8 +55,10 @@ export function createMockDb({ storage, key, seed }: MockDbOptions): MockDb {
     ranking: (config, query) => paginate(rankMatches(state.matches, config), query, state.revision),
     history: (playerId, query) => paginate(historyOf(state.matches, playerId), query, state.revision),
     register(record) {
+      const existing = state.matches.find((match) => match.matchId === record.matchId)
+      if (existing) return { record: existing, created: false }
       commit({ revision: state.revision + 1, matches: [...state.matches, record] })
-      return record
+      return { record, created: true }
     },
     reset() {
       // The revision keeps rising: a client still holding pages from before
