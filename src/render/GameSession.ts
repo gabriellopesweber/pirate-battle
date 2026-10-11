@@ -19,6 +19,11 @@ export interface GameSessionOptions {
   onEnd?: (result: MatchResult) => void
   /** The restart key was pressed; the owner starts a new match. */
   onRestart?: () => void
+  /**
+   * Browser tests only: real time no longer advances the match, only
+   * dvanceSteps does. Rendering, input and the rules run as usual.
+   */
+  manualClock?: boolean
 }
 
 /**
@@ -176,7 +181,7 @@ export class GameSession {
 
   private readonly tick = (ticker: Ticker): void => {
     const running = this.match.status === 'running'
-    if (running) this.loop.advance(ticker.deltaMS / 1000)
+    if (running && !this.options.manualClock) this.loop.advance(ticker.deltaMS / 1000)
     this.render(running ? ticker.deltaMS / 1000 : 0)
   }
 
