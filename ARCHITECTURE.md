@@ -351,6 +351,7 @@ hand-edited entry falls back instead of crashing.
 | `pirate-battle:player` | localStorage | the local player's id and display name, created on first use |
 | `pirate-battle:mock-db` | localStorage | the mock API's confirmed matches and revision (see below) |
 | `pirate-battle:pending-matches` | localStorage | completed matches the server has not confirmed yet |
+| `pirate-battle:network` | localStorage | the mock API's network scenario and seed |
 
 On load, the app shows the result screen only if the session marker and a valid last result both
 exist; otherwise the menu. So a refresh on the result screen shows it again, and a refresh during
@@ -453,6 +454,22 @@ by a test: the automatic retry gets `200` with the original record; two requests
 Only the end of a match reaches this path. Leaving combat or refreshing during it produces no
 result, so an abandoned match is never registered. A new match can start at any time; pending
 registrations never block the game.
+
+### Network scenarios
+
+Thirteen scenarios (`mocks/scenarios`, listed in the README) reproduce the failures the brief asks
+for. A pure planner decides each answer from the scenario, the request count and a seeded RNG:
+a delay, and an outcome — the normal answer, an empty page, a connection failure or an HTTP
+status. The handlers apply the plan and **compute the answer before waiting**, as a real server
+reads and then the network is slow: a late answer carries the revision it was read at (so the
+out-of-order scenario really exercises the late-response guard), and in "timeout after
+registering" the match is stored before its answer is delayed past the client's timeout.
+
+The scenario and seed live in `mocks/networkSettings` — kept in localStorage, overridden by
+`?scenario=` and `?seed=` in the URL. The menu's panel (`ui/network`) changes them through
+`mocks/controls`, which `startMockApi` fills in; the panel is hidden if the mock API did not start.
+Changing the scenario invalidates both tabs and resends pending registrations; Reset restores the
+fixtures and clears every confirmed, pending and last result.
 
 ## Balancing decisions and known limitations
 

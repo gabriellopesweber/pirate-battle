@@ -77,6 +77,46 @@ The Options screen exposes two of them:
 Below 1 s the arena fills up to the alive-enemy cap within seconds; above 10 s a short match may
 not show both enemy types. Each match uses a snapshot of the options taken when it starts.
 
+## Network scenarios
+
+The ranking and history API is a mock served by MSW — in development and in the deployed build. Its
+network conditions are selectable, so every failure the game handles can be reproduced on demand.
+
+**Selecting one:** open **Network scenario** at the foot of the main menu and pick from the list,
+or put it in the URL — `?scenario=offline`, optionally with `&seed=42` for the randomness of the
+variable latency. The choice is kept across refreshes, and the panel shows the active scenario even
+when collapsed. A change applies at once: both tabs refetch and pending registrations are resent.
+
+**Resetting:** **Reset data** in the same panel restores the fixtures and the Success scenario,
+clears confirmed and pending registrations and the last result, and reloads.
+
+| Scenario | URL value | What happens |
+|---|---|---|
+| Success | `success` | Every request answers at once; the ranking has several pages |
+| Empty lists | `empty` | Ranking and history answer with no matches |
+| Slow | `slow` | Every answer takes about two seconds |
+| Variable latency | `jitter` | Each answer takes 0.1–1.5 s, drawn from the seed |
+| Out-of-order answers | `out-of-order` | Each read answers after the one sent next |
+| Timeout | `timeout` | Every answer arrives after the client's 5 s timeout |
+| Connection failure | `offline` | Every request fails to reach the server |
+| Server error (500) | `server-error` | Every request gets a 500 |
+| Rejected request (400) | `bad-request` | Every request gets a 400 |
+| Ranking fails | `ranking-fails` | Only the ranking answers with a 500 |
+| History fails | `history-fails` | Only the match history answers with a 500 |
+| Timeout after registering | `register-timeout` | The server stores a match but answers its first send too late; resends recover it without a duplicate |
+| Unavailable at match end | `register-offline` | Registering fails; the match stays pending until you switch back to Success |
+
+**Reproducing the failures the brief lists:**
+
+- *Ranking or history read failure, loading and retry:* `history-fails` or `ranking-fails`, then
+  open the tab — the error explains itself and offers **Try again**; switching back to Success
+  recovers
+- *Late answers never overwrite newer data:* `out-of-order`, then page through the ranking
+- *Timeout after registering, without duplication:* `register-timeout`, then finish a match — the
+  result shows **Saved** and the history holds one entry
+- *Unavailable at match end, registered after recovery:* `register-offline`, finish a match (the
+  result shows it is not saved), then pick Success in the menu — the pending match is sent
+
 ## Environment variables
 
 | Variable | Default | Purpose |
