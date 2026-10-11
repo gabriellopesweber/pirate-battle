@@ -56,6 +56,12 @@ keyboard on a match whose clock and seed they control — open `/?test&clock=man
 see what they see (`window.__pirateBattle.state()`, `window.__pirateBattle.step(1)`); see
 `ARCHITECTURE.md` → *Browser-test instrumentation*.
 
+**Test report.** Every run writes an HTML report to `playwright-report/`; a failing test keeps its
+trace (each step with the page, network and console) and a screenshot. Locally, `pnpm test:e2e`
+then `pnpm test:e2e:report`. In CI, every run publishes the report as the `playwright-report`
+artifact (Actions → the run → *Artifacts*, kept 14 days); unzip it and open it with
+`pnpm exec playwright show-report <folder>` — the traces open from the report.
+
 **Visual baselines.** The menu, the arena at the start of a seeded match and the result screen are
 compared against screenshots in `tests/e2e/__screenshots__/`, rendered on Linux in the official
 Playwright image — the same one CI runs the suite in. Fonts and software WebGL differ on other

@@ -108,8 +108,14 @@ Priority is **consequence, not effort** — "what happens to the evaluation if t
   fire, end by time and by sinking, clean restart, pause and focus loss, result after refresh);
   flows 1, 2 and 9 were already covered. The end-by-time test fights like a player: an idle ship
   always sinks before 60 s · **#15**
-- [ ] **E2E data suite and visual regression** — flows 10–12; baselines for menu, stable arena
-  and result · **#16**
+- [x] **E2E data suite and visual regression** — flows 10–12 on desktop and mobile, failing on any
+  uncaught page error; baselines for menu, stable arena and result, rendered in the Playwright
+  image that CI runs the E2E job in · **#16**
+- [x] **Flow 9 in full** — checking the suite against the brief showed two gaps in flow 9:
+  repeated navigation between screens (three rounds of options, a match left from the pause menu
+  and one played to its result, each match starting clean) and touch actually driving the ship
+  (real touches held while the test clock steps: sail, turn, all three weapons, two thumbs at
+  once) · **#51**
 - [ ] **Accessibility** — keyboard menus, visible focus, dialog focus trap, labels, contrast,
   accessible errors, semantic live status without per-frame announcements, supported orientation ·
   **#17**
