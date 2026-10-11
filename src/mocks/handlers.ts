@@ -14,6 +14,9 @@ export function createHandlers(db: MockDb, apiBase: string) {
   const url = (path: string) => `${apiBase.replace(/\/$/, '')}${path}`
 
   return [
+    // Lets the page check that the worker is answering for it (#42).
+    http.get(url(MOCK_HEALTH_PATH), () => HttpResponse.json({ mock: true })),
+
     http.get(url('/ranking'), ({ request }) => {
       const params = new URL(request.url).searchParams
       const config = parseConfig(params)
@@ -38,6 +41,8 @@ export function createHandlers(db: MockDb, apiBase: string) {
     }),
   ]
 }
+
+export const MOCK_HEALTH_PATH = '/mock-health'
 
 const PAGE_ERROR = `page must be 1 or more; pageSize between 1 and ${String(MAX_PAGE_SIZE)}.`
 

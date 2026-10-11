@@ -9,6 +9,7 @@ import {
   PAGE_SIZE,
 } from '@/api/contracts'
 import { type ScoresRepository, scoresRepository } from '@/api/scoresRepository'
+import { withTransportRecovery } from '@/api/transportRecovery'
 
 /**
  * Every score query lives under `scores`, so one invalidation refreshes both
@@ -48,16 +49,20 @@ export const rankingQuery = (repository: ScoresRepository, config: MatchConfig, 
   queryOptions({
     ...common,
     queryKey: scoreKeys.ranking(config, page),
-    queryFn: async ({ signal }) =>
-      parsePage((await repository.getRanking(config, { page, pageSize: PAGE_SIZE }, signal)).data, isRankingEntry),
+    queryFn: ({ signal }) =>
+      withTransportRecovery(async () =>
+        parsePage((await repository.getRanking(config, { page, pageSize: PAGE_SIZE }, signal)).data, isRankingEntry),
+      ),
   })
 
 export const historyQuery = (repository: ScoresRepository, playerId: string, page: number) =>
   queryOptions({
     ...common,
     queryKey: scoreKeys.history(playerId, page),
-    queryFn: async ({ signal }) =>
-      parsePage((await repository.getHistory(playerId, { page, pageSize: PAGE_SIZE }, signal)).data, isMatchRecord),
+    queryFn: ({ signal }) =>
+      withTransportRecovery(async () =>
+        parsePage((await repository.getHistory(playerId, { page, pageSize: PAGE_SIZE }, signal)).data, isMatchRecord),
+      ),
   })
 
 /** While another page loads, the previous one stays on screen. */
