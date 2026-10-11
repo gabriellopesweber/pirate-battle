@@ -54,7 +54,9 @@ export function createMockDb({ storage, key, seed }: MockDbOptions): MockDb {
       return record
     },
     reset() {
-      commit(fresh())
+      // The revision keeps rising: a client still holding pages from before
+      // the reset must see the new ones as newer.
+      commit({ revision: state.revision + 1, matches: seed() })
     },
   }
 }

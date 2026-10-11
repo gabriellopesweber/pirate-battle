@@ -64,6 +64,15 @@ describe('createMockDb', () => {
     expect(open().history('me', firstPage).totalItems).toBe(0)
   })
 
+  it('reset still raises the revision, so pages read before it count as older', () => {
+    const db = setup().open()
+    const before = db.history('me', firstPage).revision
+
+    db.reset()
+
+    expect(db.history('me', firstPage).revision).toBeGreaterThan(before)
+  })
+
   it('keeps working in memory when storage is unavailable', () => {
     const db = createMockDb({
       storage: () => {
