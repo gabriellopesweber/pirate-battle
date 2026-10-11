@@ -350,6 +350,7 @@ hand-edited entry falls back instead of crashing.
 | `pirate-battle:screen` | sessionStorage | `"result"` while the result screen is shown |
 | `pirate-battle:player` | localStorage | the local player's id and display name, created on first use |
 | `pirate-battle:mock-db` | localStorage | the mock API's confirmed matches and revision (see below) |
+| `pirate-battle:pending-matches` | localStorage | completed matches the server has not confirmed yet |
 
 On load, the app shows the result screen only if the session marker and a valid last result both
 exist; otherwise the menu. So a refresh on the result screen shows it again, and a refresh during
@@ -418,7 +419,33 @@ data.
 - **Failures never block the game:** if the worker cannot start, the app renders anyway and only the
   tabs show their error, with a Try again button.
 
-_Match registration, invalidation after it and pending-registration recovery arrive in #13._
+### Registering a match
+
+A completed match produces exactly one history record and one ranking entry, however many sends
+it takes.
+
+1. **The id is generated on the client**, once, when the match ends (`app/matchRecord`). Every
+   later send of that match carries it.
+2. **The server keys matches by id.** `POST /api/matches` answers `201` when it stores a match and
+   `200` with the stored record when the id already exists — a resend changes nothing, not even the
+   revision. So every send is safe to repeat.
+3. **The match is queued before its first send** (`storage/pendingMatches`, in localStorage) and
+   leaves the queue only on a confirmed answer. A failure, a timeout or a refresh in between never
+   loses it.
+4. **Sending** is a TanStack Query mutation (`api/registration`) under the same retry policy as the
+   reads. On success the match leaves the queue and every `['scores', …]` query is invalidated, so
+   both tabs refresh.
+5. **Recovery:** when the app starts it resends every pending match once (guarded against Strict
+   Mode's double mount). The result screen shows the status — sending, saved, not sent yet, or the
+   failure with **Try again** — and keeps showing it after a refresh, because the stored result
+   carries the match id.
+
+The case the brief singles out — the server stores the match but the answer is lost — is covered
+by a test: the automatic retry gets `200` with the original record; two requests, one entry.
+
+Only the end of a match reaches this path. Leaving combat or refreshing during it produces no
+result, so an abandoned match is never registered. A new match can start at any time; pending
+registrations never block the game.
 
 ## Balancing decisions and known limitations
 
