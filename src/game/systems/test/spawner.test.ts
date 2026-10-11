@@ -56,7 +56,11 @@ describe('spawner', () => {
     expect(world.enemies.size).toBe(3)
   })
 
-  it('only spawns in open water, far from the player and from other enemies', () => {
+  // 30 seeds × 30 s of simulation: ~0.5 s alone, but several times that while
+  // the rest of the suite competes for the CPU — once past the 5 s default.
+  // The seeds are what make the property meaningful, so the budget grows
+  // instead of the sweep shrinking.
+  it('only spawns in open water, far from the player and from other enemies', { timeout: 30_000 }, () => {
     const { spawn } = DEFAULT_GAME_CONFIG
     for (let seed = 1; seed <= 30; seed++) {
       const world = createWorld(DEFAULT_GAME_CONFIG, seed)
