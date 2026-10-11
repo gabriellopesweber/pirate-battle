@@ -3,6 +3,8 @@ import { local, readJson, writeJson } from '@/storage/local'
 
 /** What the result screen shows, kept so it survives a refresh. */
 export interface StoredResult {
+  /** Links the result to its registration, so the status survives a refresh too. */
+  matchId: string
   score: number
   durationSeconds: number
   reason: EndReason
@@ -17,6 +19,7 @@ const isStoredResult = (value: unknown): value is StoredResult => {
   // Checked as an unknown record: the stored value may be anything.
   const r = value as Record<string, unknown>
   return (
+    typeof r.matchId === 'string' &&
     typeof r.score === 'number' &&
     typeof r.durationSeconds === 'number' &&
     (r.reason === 'time-up' || r.reason === 'destroyed') &&

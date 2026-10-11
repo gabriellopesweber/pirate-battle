@@ -67,7 +67,13 @@ test('shows the last result again after a refresh', async ({ page }) => {
   await page.evaluate(() => {
     localStorage.setItem(
       'pirate-battle:last-result',
-      JSON.stringify({ score: 7, durationSeconds: 75, reason: 'destroyed', endedAt: new Date().toISOString() }),
+      JSON.stringify({
+        matchId: 'e2e-match',
+        score: 7,
+        durationSeconds: 75,
+        reason: 'destroyed',
+        endedAt: new Date().toISOString(),
+      }),
     )
     sessionStorage.setItem('pirate-battle:screen', JSON.stringify('result'))
   })
