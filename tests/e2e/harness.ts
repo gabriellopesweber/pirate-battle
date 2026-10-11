@@ -8,7 +8,7 @@ import type { MatchSnapshot } from '../../src/testing/snapshot'
  * through the game's real controls — the keyboard here.
  */
 
-interface Harness {
+export interface Harness {
   state: () => MatchSnapshot | null
   step: (seconds: number) => void
 }

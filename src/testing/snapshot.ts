@@ -1,13 +1,17 @@
-import type { Match, MatchResult } from '@/game/match/match'
+import type { Match } from '@/game/match/match'
 import { circleIsClear } from '@/game/world/arena'
 
 /**
  * A read-only picture of a match for browser tests: plain data that survives
  * JSON, copied so a test can never change the match through it. Tests act on
  * the game only through its real controls; this is how they see the effect.
+ *
+ * The types below are the contract with the tests and spell themselves out:
+ * the E2E project type-checks this file without reaching into the game's
+ * modules, and `snapshotMatch` fails to compile if the game drifts from them.
  */
 export interface MatchSnapshot {
-  status: Match['status']
+  status: 'running' | 'paused' | 'ended'
   score: number
   seed: number
   timeLeft: number
@@ -21,7 +25,7 @@ export interface MatchSnapshot {
   projectiles: { id: number; side: 'player' | 'enemy'; position: Point }[]
   /** Seconds until each player weapon can fire again; 0 means ready. */
   weapons: { front: number; left: number; right: number }
-  result: Omit<MatchResult, 'config'> | null
+  result: { score: number; durationSeconds: number; reason: 'time-up' | 'destroyed'; seed: number } | null
 }
 
 interface Point {
