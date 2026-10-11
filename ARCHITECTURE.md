@@ -32,10 +32,14 @@ src/
   api/          Axios client, typed contracts, TanStack Query hooks
   mocks/        MSW handlers, fixtures, persistent mock db, network scenarios
   storage/      local persistence: options, last result, pending registrations
+  **/test/      Vitest — each module's unit tests, next to it
 tests/
-  unit/         Vitest — pure rules
   e2e/          Playwright — flows and visual baselines
 ```
+
+Unit tests live beside the code they test (`src/game/core/rng.ts` →
+`src/game/core/test/rng.test.ts`), so moving or deleting a module shows its test in the same
+diff. Vitest's `include` is exactly `src/**/test/**/*.test.{ts,tsx}`.
 
 Dependency direction: `ui → app → render / input → game`. `game/` imports nothing from React or
 Pixi, which is what lets it run under Vitest without a canvas.
