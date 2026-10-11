@@ -1,20 +1,9 @@
 import { expect, type Page, test } from '@playwright/test'
+import { chooseScenario, openTab, tabPanel } from './helpers'
 
 async function openMenuAt(page: Page, path: string) {
   await page.goto(path)
   await expect(page.getByRole('button', { name: 'Play' })).toBeVisible({ timeout: 15_000 })
-}
-
-const tabPanel = (page: Page, name: string) => page.getByRole('tabpanel', { name })
-
-async function openTab(page: Page, name: 'Ranking' | 'Match History') {
-  await page.getByRole('tab', { name }).click()
-  return tabPanel(page, name)
-}
-
-async function chooseScenario(page: Page, label: string) {
-  await page.getByText('Network scenario').click()
-  await page.getByRole('combobox', { name: 'Scenario' }).selectOption({ label })
 }
 
 test('a scenario chosen in the URL applies on load and only where it says', async ({ page }) => {

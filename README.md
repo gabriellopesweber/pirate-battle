@@ -45,7 +45,7 @@ Optionally copy `.env.example` to `.env` — the defaults work out of the box.
 | `pnpm typecheck` | TypeScript, no emit |
 | `pnpm test` | Unit tests (game rules) |
 | `pnpm test:e2e` | Playwright, desktop and mobile Chromium |
-| `pnpm test:e2e:update` | Refresh visual baselines |
+| `pnpm test:e2e:update` | Refresh visual baselines (on Linux; see below) |
 | `pnpm test:e2e:report` | Open the last HTML report |
 | `pnpm check` | lint + typecheck + unit + build |
 
@@ -55,6 +55,18 @@ failures leave an HTML report (`pnpm test:e2e:report`) and a trace. Gameplay tes
 keyboard on a match whose clock and seed they control — open `/?test&clock=manual&matchSeed=7` to
 see what they see (`window.__pirateBattle.state()`, `window.__pirateBattle.step(1)`); see
 `ARCHITECTURE.md` → *Browser-test instrumentation*.
+
+**Visual baselines.** The menu, the arena at the start of a seeded match and the result screen are
+compared against screenshots in `tests/e2e/__screenshots__/`, rendered on Linux in the official
+Playwright image — the same one CI runs the suite in. Fonts and software WebGL differ on other
+systems, so there these three tests are skipped. To refresh the baselines from any machine with
+Docker (the second volume keeps the container's `node_modules` apart from the host's):
+
+```sh
+docker run --rm --ipc=host -v "$PWD:/work" -v /work/node_modules -w /work \
+  mcr.microsoft.com/playwright:v1.64.0-noble \
+  bash -c "corepack enable && pnpm install --frozen-lockfile && pnpm test:e2e:update tests/e2e/visual.spec.ts"
+```
 
 ## Controls
 

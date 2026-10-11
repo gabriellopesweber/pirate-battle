@@ -1,4 +1,6 @@
 node_modules
+# pnpm's store, when installing in a container with the repo mounted (README → Visual baselines)
+.pnpm-store
 dist
 *.local
 .env
