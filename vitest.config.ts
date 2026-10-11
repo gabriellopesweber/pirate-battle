@@ -15,5 +15,9 @@ export default defineConfig({
   test: {
     include: ['src/**/test/**/*.test.{ts,tsx}'],
     environment: 'node',
+    setupFiles: ['src/test-utils/setup.ts'],
+    // Above Testing Library's 5 s wait (src/test-utils/setup.ts), so a slow
+    // wait fails as a wait — with its message — rather than as a test timeout.
+    testTimeout: 15_000,
   },
 })
