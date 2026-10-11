@@ -474,6 +474,33 @@ The scenario and seed live in `mocks/networkSettings` — kept in localStorage, 
 Changing the scenario invalidates both tabs and resends pending registrations; Reset restores the
 fixtures and clears every confirmed, pending and last result.
 
+## Browser-test instrumentation
+
+The gameplay E2E tests (flows 3–8 of the brief) need a match that replays exactly, without
+reaching into the rules. `src/testing/` provides that, switched on only by the URL:
+
+| URL | Effect |
+|---|---|
+| `?test` | exposes `window.__pirateBattle` — `state()` and `step(seconds)` |
+| `&clock=manual` | real time no longer moves a match; only `step` does (`GameSession`'s `manualClock`) |
+| `&matchSeed=7` | every match, restarts included, starts from this seed |
+
+- **Observe, never act.** `state()` is a JSON snapshot of the match — player, enemies,
+  projectiles, weapon cooldowns, score, time, islands — copied, so a test cannot change the match
+  through it. Tests act only through the game's own controls: Playwright's keyboard, or key events
+  dispatched to the same window listener the keyboard feeds.
+- **The rules run for real.** `step(seconds)` calls `advanceSteps`, the fixed-step loop's manual
+  stepping: every step runs input, movement, collisions, weapons, enemies and rendering exactly as
+  a real frame does; only the pace is the test's.
+- **Without `?test` nothing changes**: the hooks are not installed, the clock follows real time,
+  and seeds are random.
+
+`tests/e2e/harness.ts` wraps it: start a test match with given options and seed, read the state,
+step time, hold a key for a stretch of game time, aim with the turn keys. A test that needs to
+survive a whole match (end by time) plays like a person — aim at the nearest enemy, hold the bow
+cannon — because a player who does not fight back always sinks before 60 s; that was measured by
+simulating every seed from 1 to 60 with the real rules.
+
 ## Balancing decisions and known limitations
 
 - **Islands within 3 × 3 tiles**, six of them, two flanking the player's start as cover — chosen

@@ -49,6 +49,13 @@ Optionally copy `.env.example` to `.env` — the defaults work out of the box.
 | `pnpm test:e2e:report` | Open the last HTML report |
 | `pnpm check` | lint + typecheck + unit + build |
 
+**Tests.** Unit and component tests (Vitest) live next to the code, in `src/**/test/`. The
+Playwright suite in `tests/e2e/` runs against the production build, on desktop and mobile Chromium;
+failures leave an HTML report (`pnpm test:e2e:report`) and a trace. Gameplay tests drive the real
+keyboard on a match whose clock and seed they control — open `/?test&clock=manual&matchSeed=7` to
+see what they see (`window.__pirateBattle.state()`, `window.__pirateBattle.step(1)`); see
+`ARCHITECTURE.md` → *Browser-test instrumentation*.
+
 ## Controls
 
 | Action | Keyboard | Touch |

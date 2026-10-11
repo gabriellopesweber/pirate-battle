@@ -4,6 +4,8 @@ import { randomSeed } from '@/game/core/rng'
 import type { MatchResult } from '@/game/match/match'
 import { InputState } from '@/input/inputState'
 import { GameSession } from '@/render/GameSession'
+import { attachSession, detachSession } from '@/testing/harness'
+import { testOptions } from '@/testing/testOptions'
 import { useAssets } from '@/ui/assets/AssetsContext'
 import { ControlsLegend } from '@/ui/game/ControlsLegend'
 import { Hud } from '@/ui/game/Hud'
@@ -17,19 +19,27 @@ interface GameViewProps {
   onMainMenu: () => void
 }
 
+/** A random seed per match, unless a browser test fixes it with ?matchSeed. */
+const nextSeed = () => testOptions.matchSeed ?? randomSeed()
+
 /**
  * The combat screen: mounts one game session and tears it down on unmount,
  * so leaving the screen abandons the match. React renders this component
  * when the HUD changes — never per frame.
  *
- * Restarting starts a new session with a fresh seed: the effect cleanup
- * destroys the old one, so nothing of the previous match carries over.
+ * Restarting starts a new session — with a new seed, unless a test fixed it:
+ * the effect cleanup destroys the old one, so nothing of the previous match
+ * carries over.
  */
 export function GameView({ config, onEnd, onMainMenu }: GameViewProps) {
   const assets = useAssets()
-  const [seed, setSeed] = useState(randomSeed)
+  const [seed, setSeed] = useState(nextSeed)
+  // Counts restarts so each one remounts the session, even when a fixed seed
+  // leaves `seed` unchanged.
+  const [restarts, setRestarts] = useState(0)
   const restart = () => {
-    setSeed(randomSeed())
+    setSeed(nextSeed())
+    setRestarts((count) => count + 1)
   }
   const container = useRef<HTMLDivElement>(null)
   const [session, setSession] = useState<GameSession | null>(null)
@@ -56,13 +66,16 @@ export function GameView({ config, onEnd, onMainMenu }: GameViewProps) {
       onRestart: () => {
         latest.current.restart()
       },
+      manualClock: testOptions.manualClock,
     })
     setSession(created)
+    attachSession(created)
     return () => {
+      detachSession(created)
       created.destroy()
       setSession(null)
     }
-  }, [assets, config, seed, input])
+  }, [assets, config, seed, restarts, input])
 
   return (
     <div className="game-view">

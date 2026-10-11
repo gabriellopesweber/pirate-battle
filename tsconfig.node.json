@@ -20,7 +20,9 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "allowJs": true,
-    "checkJs": true
+    "checkJs": true,
+
+    "paths": { "@/*": ["./src/*"] }
   },
   "include": [
     "vite.config.ts",
