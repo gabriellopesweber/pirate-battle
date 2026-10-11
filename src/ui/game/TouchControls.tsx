@@ -12,31 +12,44 @@ interface TouchControlsProps {
 // Round button 64 × 64 with a 32 × 32 icon centred, as the UI atlas metadata lays it out.
 const BUTTON_SIZE = 64
 
-const STEERING: readonly { action: Action; icon: string; label: string }[] = [
-  { action: 'turnLeft', icon: 'icon_turn_left', label: 'Turn left' },
-  { action: 'thrust', icon: 'icon_forward', label: 'Sail forward' },
-  { action: 'turnRight', icon: 'icon_turn_right', label: 'Turn right' },
+/** Where a button sits in its thumb cluster: one on top, one on each side below it. */
+type Slot = 'top' | 'left' | 'right'
+
+interface Control {
+  action: Action
+  icon: string
+  label: string
+  slot: Slot
+}
+
+const STEERING: readonly Control[] = [
+  { action: 'thrust', icon: 'icon_forward', label: 'Sail forward', slot: 'top' },
+  { action: 'turnLeft', icon: 'icon_turn_left', label: 'Turn left', slot: 'left' },
+  { action: 'turnRight', icon: 'icon_turn_right', label: 'Turn right', slot: 'right' },
 ]
 
-const WEAPONS: readonly { action: Action; icon: string; label: string }[] = [
-  { action: 'fireLeft', icon: 'icon_fire_left', label: 'Fire port broadside' },
-  { action: 'fireFront', icon: 'icon_fire_front', label: 'Fire bow cannon' },
-  { action: 'fireRight', icon: 'icon_fire_right', label: 'Fire starboard broadside' },
+const WEAPONS: readonly Control[] = [
+  { action: 'fireFront', icon: 'icon_fire_front', label: 'Fire bow cannon', slot: 'top' },
+  { action: 'fireLeft', icon: 'icon_fire_left', label: 'Fire port broadside', slot: 'left' },
+  { action: 'fireRight', icon: 'icon_fire_right', label: 'Fire starboard broadside', slot: 'right' },
 ]
 
 /**
- * On-screen controls for touch screens. Each button tracks its own pointer,
- * so one thumb can steer while the other fires. Shown only on coarse pointers.
+ * On-screen controls for touch screens, as two thumb clusters: steering under
+ * the left thumb (forward on top, a turn on each side), weapons under the right
+ * (bow cannon on top, a broadside on each side). Each button tracks its own
+ * pointer, so one thumb can steer while the other fires. Shown only on coarse
+ * pointers.
  */
 export function TouchControls({ input, ui }: TouchControlsProps) {
   return (
     <div className="touch-controls">
-      <div className="touch-controls__group">
+      <div className="touch-controls__cluster">
         {STEERING.map((control) => (
           <TouchButton key={control.action} {...control} input={input} ui={ui} />
         ))}
       </div>
-      <div className="touch-controls__group">
+      <div className="touch-controls__cluster">
         {WEAPONS.map((control) => (
           <TouchButton key={control.action} {...control} input={input} ui={ui} />
         ))}
@@ -45,15 +58,12 @@ export function TouchControls({ input, ui }: TouchControlsProps) {
   )
 }
 
-interface TouchButtonProps {
-  action: Action
-  icon: string
-  label: string
+interface TouchButtonProps extends Control {
   input: InputState
   ui: Spritesheet
 }
 
-function TouchButton({ action, icon, label, input, ui }: TouchButtonProps) {
+function TouchButton({ action, icon, label, slot, input, ui }: TouchButtonProps) {
   // The ref guards against double press/release; the state only drives the pressed look.
   const held = useRef(false)
   const [pressed, setPressed] = useState(false)
@@ -77,7 +87,7 @@ function TouchButton({ action, icon, label, input, ui }: TouchButtonProps) {
   return (
     <button
       type="button"
-      className="touch-controls__button"
+      className={`touch-controls__button touch-controls__button--${slot}`}
       aria-label={label}
       tabIndex={-1}
       onPointerDown={press}
