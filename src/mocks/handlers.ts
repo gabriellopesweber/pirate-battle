@@ -17,7 +17,8 @@ import { type Endpoint, planResponse, type ScenarioId } from '@/mocks/scenarios'
 /** How the network behaves: the active scenario, its seeded randomness, and how to wait. */
 export interface NetworkConditions {
   scenario: () => ScenarioId
-  rng: Rng
+  /** Read per request, so a new seed applies at once. */
+  rng: () => Rng
   /** Defaults to MSW's `delay`; tests inject a controllable one. */
   wait?: (ms: number) => Promise<void>
 }
@@ -36,7 +37,7 @@ export function createHandlers(db: MockDb, apiBase: string, network?: NetworkCon
    */
   async function respond(endpoint: Endpoint, firstSend: boolean, answer: () => Response, empty: () => Response) {
     const plan = network
-      ? planResponse(network.scenario(), { endpoint, index: index++, firstSend }, network.rng)
+      ? planResponse(network.scenario(), { endpoint, index: index++, firstSend }, network.rng())
       : { delayMs: 0, outcome: 'answer' as const }
     if (plan.outcome === 'network-error') {
       await wait(plan.delayMs)

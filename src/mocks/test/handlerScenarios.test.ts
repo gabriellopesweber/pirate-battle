@@ -41,12 +41,13 @@ beforeAll(() => {
 beforeEach(() => {
   scenario = 'success'
   waits = []
+  const rng = createRng(1)
   db = createMockDb({
     storage: () => new MemoryStorage(),
     key: 'db',
     seed: () => [makeMatch({ matchId: 'rival', playerId: 'rival', score: 4 })],
   })
-  server.resetHandlers(...createHandlers(db, BASE, { scenario: () => scenario, rng: createRng(1), wait }))
+  server.resetHandlers(...createHandlers(db, BASE, { scenario: () => scenario, rng: () => rng, wait }))
 })
 
 afterAll(() => {

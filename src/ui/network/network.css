@@ -1,0 +1,187 @@
+/* Same vocabulary as the controls card: dark glass, soft parchment border, gold accents. */
+
+.network {
+  width: 100%;
+  /* The last item of the menu: keep it clear of the panel's bottom frame. */
+  margin: 0.5rem 0 0.75rem;
+}
+
+.network__summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem 0.5rem;
+  min-height: 2.75rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.6rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  list-style: none;
+  transition: background-color 0.15s;
+}
+
+.network__summary::-webkit-details-marker {
+  display: none;
+}
+
+.network__summary:hover {
+  background: rgb(0 0 0 / 0.18);
+}
+
+.network__chevron {
+  width: 0.45rem;
+  height: 0.45rem;
+  border-right: 2px solid currentcolor;
+  border-bottom: 2px solid currentcolor;
+  opacity: 0.8;
+  transform: rotate(-45deg);
+  transition: transform 0.15s;
+}
+
+.network[open] .network__chevron {
+  transform: rotate(45deg);
+}
+
+/* Long scenario names move the badge to its own line instead of breaking words. */
+.network__title,
+.network__badge {
+  white-space: nowrap;
+}
+
+.network__title {
+  opacity: 0.85;
+}
+
+.network__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.15rem 0.6rem;
+  border: 1px solid rgb(244 234 213 / 0.25);
+  border-radius: 999px;
+  background: rgb(0 0 0 / 0.25);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: none;
+}
+
+.network__badge--simulating {
+  border-color: rgb(247 210 122 / 0.6);
+  color: var(--color-gold);
+}
+
+.network__badge--simulating::before {
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 50%;
+  background: currentcolor;
+  content: '';
+}
+
+.network__card {
+  display: grid;
+  gap: 0.45rem;
+  margin-top: 0.35rem;
+  padding: 0.7rem 0.75rem;
+  border: 1px solid rgb(244 234 213 / 0.18);
+  border-radius: 0.6rem;
+  background: rgb(0 0 0 / 0.22);
+  text-align: left;
+}
+
+.network__label {
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+.network__select {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.4rem 2.25rem 0.4rem 0.75rem;
+  border: 1px solid rgb(244 234 213 / 0.25);
+  border-radius: 0.5rem;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23f7d27a' stroke-width='2'/%3E%3C/svg%3E")
+      right 0.8rem center / 0.75rem no-repeat,
+    rgb(0 0 0 / 0.3);
+  color: inherit;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  appearance: none;
+  transition: border-color 0.15s;
+}
+
+.network__select:hover {
+  border-color: rgb(244 234 213 / 0.5);
+}
+
+.network__select option {
+  background: #22293a;
+  color: var(--color-ink);
+}
+
+.network__description {
+  margin: 0;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  opacity: 0.8;
+}
+
+.network__reset {
+  justify-self: end;
+  min-height: 2.75rem;
+  padding: 0.3rem 1rem;
+  border: 1px solid rgb(244 234 213 / 0.3);
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    color 0.15s;
+}
+
+.network__reset:hover {
+  border-color: var(--color-gold);
+  color: var(--color-gold);
+}
+
+/*
+ * Short screens (small laptops, landscape phones): the menu must keep clear of
+ * scrolling, as the rest of it does in screens.css. The collapsed line shrinks
+ * to WCAG 2.2's minimum target size, 24 px.
+ */
+@media (max-height: 660px) {
+  .network {
+    margin: 0 0 0.15rem;
+  }
+
+  .network__summary {
+    min-height: 1.5rem;
+    padding: 0 0.5rem;
+  }
+
+  .network__badge {
+    padding: 0 0.5rem;
+  }
+}
+
+.network__summary:focus-visible,
+.network__select:focus-visible,
+.network__reset:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
