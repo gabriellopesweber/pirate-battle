@@ -1,13 +1,20 @@
 import { setupWorker } from 'msw/browser'
 import { API_BASE_URL } from '@/api/http'
 import { setTransportRecovery } from '@/api/transportRecovery'
+import { createRng } from '@/game/core/rng'
+import { setMockControls } from '@/mocks/controls'
 import { createMockDb } from '@/mocks/db'
 import { createFixtureMatches } from '@/mocks/fixtures'
 import { createHandlers, MOCK_HEALTH_PATH } from '@/mocks/handlers'
+import { createNetworkSettingsStore, DEFAULT_NETWORK, settingsFromUrl } from '@/mocks/networkSettings'
+import { clearLastResult } from '@/storage/lastResult'
 import { local } from '@/storage/local'
+import { pendingMatches } from '@/storage/pendingMatches'
 
 /** Confirmed matches, kept across refreshes. */
 export const MOCK_DB_KEY = 'pirate-battle:mock-db'
+/** The network scenario and seed, kept across refreshes. */
+export const NETWORK_KEY = 'pirate-battle:network'
 
 /**
  * Starts the mock ranking and history API in the browser — in development and
@@ -16,7 +23,22 @@ export const MOCK_DB_KEY = 'pirate-battle:mock-db'
 export async function startMockApi() {
   const apiBase = new URL(API_BASE_URL, window.location.href).href.replace(/\/$/, '')
   const db = createMockDb({ storage: local, key: MOCK_DB_KEY, seed: createFixtureMatches })
-  const worker = setupWorker(...createHandlers(db, apiBase))
+
+  // The URL wins over what is kept, and is kept in turn, so a refresh replays it.
+  const settings = createNetworkSettingsStore({ storage: local, key: NETWORK_KEY })
+  settings.set(settingsFromUrl(window.location.search, settings.get()))
+  let rng = createRng(settings.get().seed)
+  let seed = settings.get().seed
+  settings.subscribe(() => {
+    if (settings.get().seed !== seed) {
+      seed = settings.get().seed
+      rng = createRng(seed)
+    }
+  })
+
+  const worker = setupWorker(
+    ...createHandlers(db, apiBase, { scenario: () => settings.get().scenario, rng: () => rng }),
+  )
   const start = () =>
     worker.start({
       serviceWorker: { url: `${import.meta.env.BASE_URL}mockServiceWorker.js` },
@@ -50,6 +72,16 @@ export async function startMockApi() {
       recovering = null
     })
     return recovering
+  })
+
+  setMockControls({
+    settings,
+    reset() {
+      db.reset()
+      pendingMatches.clear()
+      clearLastResult()
+      settings.set(DEFAULT_NETWORK)
+    },
   })
 
   return { db, worker }

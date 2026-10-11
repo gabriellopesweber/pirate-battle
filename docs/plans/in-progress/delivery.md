@@ -95,9 +95,12 @@ Priority is **consequence, not effort** — "what happens to the evaluation if t
   resends pending matches on start; the result screen shows the status with Try again, also after
   a refresh. Sent as a TanStack Query mutation that invalidates both tabs. A test covers the
   stored-but-answer-lost case (two requests, one entry) · **#13**
-- [ ] **Network scenarios** — selectable, reproducible MSW scenarios (empty, paged, slow, jittered,
-  out-of-order, timeout, 4xx/5xx, offline at match end) with reset; works on the deployed build ·
-  **#14**
+- [x] **Network scenarios** — thirteen scenarios from a pure, seeded planner (success, empty,
+  slow, variable latency, out-of-order, timeout, connection failure, 500, 400, ranking or history
+  failing alone, timeout after registering, unavailable at match end); handlers compute the answer
+  before waiting, so late answers carry old revisions. Selected from a collapsed panel at the foot
+  of the menu or via `?scenario=&seed=`, kept across refreshes; Reset restores the fixtures and
+  clears every record. Works on the deployed build; documented in the README · **#14**
 - [ ] **E2E harness and gameplay suite** — seeded matches and test clock control; flows 1–9 of the
   brief; desktop and mobile · **#15**
 - [ ] **E2E data suite and visual regression** — flows 10–12; baselines for menu, stable arena

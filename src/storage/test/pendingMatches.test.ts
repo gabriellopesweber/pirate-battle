@@ -49,6 +49,18 @@ describe('createPendingStore', () => {
     expect(store.has('b')).toBe(true)
   })
 
+  it('clears every pending registration, also for the next refresh', () => {
+    const { open } = setup()
+    const store = open()
+    store.add(makeMatch({ matchId: 'a' }))
+    store.add(makeMatch({ matchId: 'b' }))
+
+    store.clear()
+
+    expect(store.list()).toEqual([])
+    expect(open().list()).toEqual([])
+  })
+
   it('keeps pending registrations across a refresh', () => {
     const { open } = setup()
     open().add(makeMatch({ matchId: 'a' }))

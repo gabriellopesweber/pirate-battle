@@ -1,5 +1,5 @@
 import type { EndReason } from '@/game/match/match'
-import { local, readJson, writeJson } from '@/storage/local'
+import { local, readJson, removeKey, writeJson } from '@/storage/local'
 
 /** What the result screen shows, kept so it survives a refresh. */
 export interface StoredResult {
@@ -33,4 +33,8 @@ export function loadLastResult(): StoredResult | null {
 
 export function saveLastResult(result: StoredResult): void {
   writeJson(local, KEY, result)
+}
+
+export function clearLastResult(): void {
+  removeKey(local, KEY)
 }

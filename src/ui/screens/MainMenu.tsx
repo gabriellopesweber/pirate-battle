@@ -5,6 +5,7 @@ import { AtlasSprite } from '@/ui/atlas/AtlasSprite'
 import { ControlsCard } from '@/ui/game/ControlsLegend'
 import { MenuButton } from '@/ui/kit/MenuButton'
 import { Panel } from '@/ui/kit/Panel'
+import { NetworkControls } from '@/ui/network/NetworkControls'
 import { HistoryPanel } from '@/ui/scores/HistoryPanel'
 import { RankingPanel } from '@/ui/scores/RankingPanel'
 
@@ -72,6 +73,8 @@ export function MainMenu({ config, playerId, onPlay, onOptions }: MainMenuProps)
           {tab === 'history' && id === 'history' && <HistoryPanel playerId={playerId} />}
         </div>
       ))}
+
+      <NetworkControls />
     </Panel>
   )
 }

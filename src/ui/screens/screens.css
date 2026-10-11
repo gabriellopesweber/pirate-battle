@@ -169,6 +169,16 @@
     display: none;
   }
 
+  /*
+   * The title art is the tallest piece of the menu (87 px at full size).
+   * Zoom, unlike a transform, shrinks its layout box too, which buys the
+   * room the network panel's line needs — measured on Linux, where system
+   * fonts run a few pixels taller than on Windows.
+   */
+  .screen__title-art {
+    zoom: 0.65;
+  }
+
   .screen__section {
     margin: 0.25rem 0;
   }
