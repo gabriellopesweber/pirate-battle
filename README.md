@@ -62,7 +62,8 @@ Optionally copy `.env.example` to `.env` — the defaults work out of the box.
 
 Moving and firing work together. Game keys are only captured while a match is running; the
 match also pauses on its own when the window loses focus or the tab is hidden. Touch buttons show
-on touch screens; keyboard controls are listed on screen.
+on touch screens as two thumb clusters — steering bottom left, weapons bottom right; keyboard
+controls are listed on screen.
 
 ## Gameplay configuration
 
