@@ -15,6 +15,8 @@ export interface PendingStore {
   has: (matchId: string) => boolean
   add: (record: MatchRecord) => void
   remove: (matchId: string) => void
+  /** Drops every pending registration — the mock API's reset. */
+  clear: () => void
   subscribe: (listener: () => void) => () => void
 }
 
@@ -47,6 +49,9 @@ export function createPendingStore({ storage, key }: PendingStoreOptions): Pendi
     },
     remove(matchId) {
       if (has(matchId)) commit(records.filter((record) => record.matchId !== matchId))
+    },
+    clear() {
+      if (records.length > 0) commit([])
     },
     subscribe(listener) {
       listeners.add(listener)
