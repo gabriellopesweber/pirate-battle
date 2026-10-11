@@ -60,3 +60,23 @@ another deliverable.
 pnpm check        # lint + typecheck + unit + build
 pnpm test:e2e     # when player-visible behaviour changed
 ```
+
+## Tests
+
+Test first: write the failing test for a behaviour, make it pass, then clean up. Commit the test
+with the code that makes it pass, so every commit is green.
+
+| Layer | Tool | Where | Covers |
+|---|---|---|---|
+| Unit | Vitest (`node`) | `src/**/test/*.test.ts` | pure rules — most tests live here |
+| Component | Vitest (`jsdom`) | `src/**/test/*.test.tsx` | a component's visible states, through its public interface |
+| E2E | Playwright | `tests/e2e/` | the brief's flows in a real browser, on the production build — few, critical |
+
+- **Next to the code.** A module's tests sit in a `test/` folder beside it; Vitest only runs
+  files matching `src/**/test/**/*.test.{ts,tsx}`.
+- **Behaviour, not implementation.** Give an input, assert the output; never assert private
+  state. One behaviour per `it`, named as a sentence; Arrange → Act → Assert; Vitest imported
+  explicitly.
+- **Doubles at the edge only.** Replace what leaves the process — the network (MSW), storage,
+  time, randomness (seeded RNG) — never the unit under test.
+- **Data through factories** (`makeMatch({ score: 3 })`), not repeated object literals.
