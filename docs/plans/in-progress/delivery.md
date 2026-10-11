@@ -101,8 +101,13 @@ Priority is **consequence, not effort** — "what happens to the evaluation if t
   before waiting, so late answers carry old revisions. Selected from a collapsed panel at the foot
   of the menu or via `?scenario=&seed=`, kept across refreshes; Reset restores the fixtures and
   clears every record. Works on the deployed build; documented in the README · **#14**
-- [ ] **E2E harness and gameplay suite** — seeded matches and test clock control; flows 1–9 of the
-  brief; desktop and mobile · **#15**
+- [x] **E2E harness and gameplay suite** — `?test` instrumentation: a read-only JSON snapshot of
+  the match, a manual clock that steps the real rules, a fixed seed; tests act only through the
+  real controls. Flows 3–8 added (movement, edge, island coast, bow and broadside fire with
+  cooldowns, damage once per hit, score without duplication, spawn interval, Chaser ram, Shooter
+  fire, end by time and by sinking, clean restart, pause and focus loss, result after refresh);
+  flows 1, 2 and 9 were already covered. The end-by-time test fights like a player: an idle ship
+  always sinks before 60 s · **#15**
 - [ ] **E2E data suite and visual regression** — flows 10–12; baselines for menu, stable arena
   and result · **#16**
 - [ ] **Accessibility** — keyboard menus, visible focus, dialog focus trap, labels, contrast,
@@ -140,6 +145,12 @@ Priority is **consequence, not effort** — "what happens to the evaluation if t
   the pages it serves in memory only and lets everything through when that list empties. Reproduced
   on demand by telling the worker the page closed; fixed by a transport recovery that restarts the
   worker when an answer breaks the contract, with an E2E test that failed before the fix · **#42**
+- [x] **Touch controls as thumb clusters** — steering under the left thumb, weapons under the
+  right, each a small triangle as mobile games lay them out; in portrait the old single row did not
+  fit (the starboard broadside ended at 428 px on a 412 px screen). An E2E test requires every
+  touch button on screen · **#45**
+- [ ] **Component tests timing out under load** — Testing Library's `findBy` gives up after 1 s,
+  and the first test of each jsdom file pays for starting the environment · **#48**
 
 ## Suggested sequence
 
