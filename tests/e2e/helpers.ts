@@ -22,3 +22,17 @@ export async function secondsLeft(page: Page): Promise<number> {
   if (!match) throw new Error(`No time in HUD: ${text}`)
   return Number(match[1]) * 60 + Number(match[2])
 }
+
+export const tabPanel = (page: Page, name: string) => page.getByRole('tabpanel', { name })
+
+/** Opens one of the main menu's score tabs and returns its panel. */
+export async function openTab(page: Page, name: 'Ranking' | 'Match History') {
+  await page.getByRole('tab', { name }).click()
+  return tabPanel(page, name)
+}
+
+/** Picks a network scenario in the main menu's panel. */
+export async function chooseScenario(page: Page, label: string) {
+  await page.getByText('Network scenario').click()
+  await page.getByRole('combobox', { name: 'Scenario' }).selectOption({ label })
+}

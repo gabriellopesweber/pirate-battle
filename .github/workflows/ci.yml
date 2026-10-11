@@ -28,6 +28,10 @@ jobs:
   e2e:
     needs: check
     runs-on: ubuntu-latest
+    # The image the visual baselines were rendered in: same browser, fonts and
+    # system libraries, so a screenshot differs only when the page does. Its tag
+    # follows the @playwright/test version in the lockfile.
+    container: mcr.microsoft.com/playwright:v1.64.0-noble
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6
@@ -36,7 +40,6 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm test:e2e
       - uses: actions/upload-artifact@v7
         if: ${{ !cancelled() }}

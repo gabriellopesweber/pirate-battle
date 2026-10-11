@@ -21,12 +21,15 @@ export interface TestMatchOptions {
   seed?: number
   sessionSeconds?: number
   spawnIntervalSeconds?: number
+  /** A network scenario for the mock API (src/mocks/scenarios.ts). */
+  scenario?: string
 }
 
 /** Opens the game with a manual clock and a fixed seed, sets the options, and starts a match. */
 export async function startTestMatch(page: Page, options: TestMatchOptions = {}): Promise<MatchSnapshot> {
-  const { seed = 1, sessionSeconds = 120, spawnIntervalSeconds = 3 } = options
-  await page.goto(`/?test&clock=manual&matchSeed=${String(seed)}`)
+  const { seed = 1, sessionSeconds = 120, spawnIntervalSeconds = 3, scenario } = options
+  const network = scenario ? `&scenario=${scenario}` : ''
+  await page.goto(`/?test&clock=manual&matchSeed=${String(seed)}${network}`)
   await page.evaluate(
     (saved) => {
       localStorage.setItem('pirate-battle:options', JSON.stringify(saved))
