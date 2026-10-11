@@ -4,6 +4,7 @@ import { ContractError } from '@/api/apiError'
 import { isMatchRecord, type MatchRecord } from '@/api/contracts'
 import { scoreKeys } from '@/api/queries'
 import { type ScoresRepository, scoresRepository } from '@/api/scoresRepository'
+import { withTransportRecovery } from '@/api/transportRecovery'
 import { pendingMatches } from '@/storage/pendingMatches'
 
 /**
@@ -15,10 +16,12 @@ import { pendingMatches } from '@/storage/pendingMatches'
 
 export const registrationKey = ['register-match'] as const
 
-async function postMatch(repository: ScoresRepository, record: MatchRecord): Promise<MatchRecord> {
-  const { data } = await repository.registerMatch(record)
-  if (!isMatchRecord(data)) throw new ContractError()
-  return data
+function postMatch(repository: ScoresRepository, record: MatchRecord): Promise<MatchRecord> {
+  return withTransportRecovery(async () => {
+    const { data } = await repository.registerMatch(record)
+    if (!isMatchRecord(data)) throw new ContractError()
+    return data
+  })
 }
 
 /** Sends a match; on success it leaves the queue and both score tabs refresh. */

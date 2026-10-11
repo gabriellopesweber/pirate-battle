@@ -418,6 +418,13 @@ data.
   through the query's `AbortSignal`.
 - **Failures never block the game:** if the worker cannot start, the app renders anyway and only the
   tabs show their error, with a Try again button.
+- **A worker that stops answering is restarted.** MSW's worker keeps the pages it serves in memory
+  only; if that list empties — the browser stopped the idle worker, or a reload's race made it
+  unregister itself — it passes every request through and the API answers with `index.html`. Every
+  request runs inside `withTransportRecovery`: an answer that breaks the contract triggers the
+  recovery the mock layer registered (check `/api/mock-health`; if it is not answering, restart the
+  worker) and one more try. The API layer only knows a recovery may exist, never that MSW does.
+  `tests/e2e/mock-api.spec.ts` puts the worker in that state on demand.
 
 ### Registering a match
 

@@ -133,6 +133,10 @@ Priority is **consequence, not effort** — "what happens to the evaluation if t
 - [x] **Spawner sweep timing out under load** — 30 seeds × 30 s of simulation took ~0.5 s alone
   but once passed Vitest's 5 s default with the whole suite running; it got an explicit budget
   with the reason beside it, the sweep unchanged · **#39**
+- [x] **Mock worker passing API requests through** — seen once after a reload: the MSW worker keeps
+  the pages it serves in memory only and lets everything through when that list empties. Reproduced
+  on demand by telling the worker the page closed; fixed by a transport recovery that restarts the
+  worker when an answer breaks the contract, with an E2E test that failed before the fix · **#42**
 
 ## Suggested sequence
 
