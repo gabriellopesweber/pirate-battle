@@ -79,13 +79,17 @@ test('shows the last result again after a refresh', async ({ page }) => {
   await expect(page.locator('.result__facts')).toContainText('1:15')
 })
 
-test('shows the scores tabs on the menu', async ({ page }) => {
+test('the scores tabs read from the mock API served by the worker', async ({ page }) => {
   await openMenu(page)
 
   await page.getByRole('tab', { name: 'Ranking' }).click()
-  await expect(page.getByRole('tabpanel', { name: 'Ranking' })).toBeVisible()
+  const ranking = page.getByRole('tabpanel', { name: 'Ranking' })
+  await expect(ranking.getByRole('table')).toBeVisible()
+  await expect(ranking.getByText(/^Page 1 of \d+$/)).toBeVisible()
+
   await page.getByRole('tab', { name: 'Match History' }).click()
-  await expect(page.getByRole('tabpanel', { name: 'Match History' })).toBeVisible()
+  const history = page.getByRole('tabpanel', { name: 'Match History' })
+  await expect(history.getByText('No matches yet. Play one to start your history.')).toBeVisible()
 })
 
 test('the menu fits a small laptop screen without scrolling', async ({ page, isMobile }) => {

@@ -1,9 +1,12 @@
 import { useState } from 'react'
+import type { MatchConfig } from '@/api/contracts'
 import { useAssets } from '@/ui/assets/AssetsContext'
 import { AtlasSprite } from '@/ui/atlas/AtlasSprite'
 import { ControlsCard } from '@/ui/game/ControlsLegend'
 import { MenuButton } from '@/ui/kit/MenuButton'
 import { Panel } from '@/ui/kit/Panel'
+import { HistoryPanel } from '@/ui/scores/HistoryPanel'
+import { RankingPanel } from '@/ui/scores/RankingPanel'
 
 type Tab = 'ranking' | 'history'
 
@@ -13,11 +16,14 @@ const TABS: readonly { id: Tab; label: string }[] = [
 ]
 
 interface MainMenuProps {
+  /** The saved options: the ranking shows matches played with them. */
+  config: MatchConfig
+  playerId: string
   onPlay: () => void
   onOptions: () => void
 }
 
-export function MainMenu({ onPlay, onOptions }: MainMenuProps) {
+export function MainMenu({ config, playerId, onPlay, onOptions }: MainMenuProps) {
   const { ui } = useAssets()
   const [tab, setTab] = useState<Tab | null>(null)
 
@@ -58,10 +64,12 @@ export function MainMenu({ onPlay, onOptions }: MainMenuProps) {
           </MenuButton>
         ))}
       </div>
-      {TABS.map(({ id, label }) => (
+      {/* A panel's content mounts only while its tab is open, so reopening a
+          tab refetches its data. */}
+      {TABS.map(({ id }) => (
         <div key={id} role="tabpanel" id={`panel-${id}`} aria-labelledby={`tab-${id}`} hidden={tab !== id}>
-          {/* Filled by the ranking and history API (#12). */}
-          <p className="screen__note">{label} will appear here.</p>
+          {tab === 'ranking' && id === 'ranking' && <RankingPanel config={config} playerId={playerId} />}
+          {tab === 'history' && id === 'history' && <HistoryPanel playerId={playerId} />}
         </div>
       ))}
     </Panel>
