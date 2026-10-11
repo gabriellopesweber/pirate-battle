@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import type { StoredResult } from '@/storage/lastResult'
-import { formatClock } from '@/ui/format'
+import { END_REASON_LABEL, formatClock } from '@/ui/format'
 import { MenuButton } from '@/ui/kit/MenuButton'
 import { Panel } from '@/ui/kit/Panel'
 
@@ -9,8 +9,6 @@ interface ResultScreenProps {
   onPlayAgain: () => void
   onMainMenu: () => void
 }
-
-const REASON = { 'time-up': 'Time up', destroyed: 'Ship sunk' } as const
 
 export function ResultScreen({ result, onPlayAgain, onMainMenu }: ResultScreenProps) {
   const playAgain = useRef<HTMLButtonElement>(null)
@@ -36,7 +34,7 @@ export function ResultScreen({ result, onPlayAgain, onMainMenu }: ResultScreenPr
         </div>
         <div>
           <dt>Ended by</dt>
-          <dd>{REASON[result.reason]}</dd>
+          <dd>{END_REASON_LABEL[result.reason]}</dd>
         </div>
         <div>
           <dt>Match record</dt>

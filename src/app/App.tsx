@@ -5,6 +5,7 @@ import type { MatchResult } from '@/game/match/match'
 import { loadLastResult, saveLastResult, type StoredResult } from '@/storage/lastResult'
 import { readJson, removeKey, session, writeJson } from '@/storage/local'
 import { loadOptions, saveOptions } from '@/storage/options'
+import { loadPlayer } from '@/storage/player'
 import { AssetGate } from '@/ui/assets/AssetGate'
 import { AssetsContext } from '@/ui/assets/AssetsContext'
 import { GameView } from '@/ui/game/GameView'
@@ -35,6 +36,7 @@ function initialScreen(): Screen {
  */
 export function App() {
   const [screen, setScreen] = useState<Screen>(initialScreen)
+  const [player] = useState(loadPlayer)
 
   const go = (next: Screen) => {
     if (next.name === 'result') writeJson(session, SCREEN_KEY, 'result')
@@ -68,6 +70,8 @@ export function App() {
           <AssetsContext value={assets}>
             {screen.name === 'menu' && (
               <MainMenu
+                config={loadOptions()}
+                playerId={player.id}
                 onPlay={play}
                 onOptions={() => {
                   go({ name: 'options' })

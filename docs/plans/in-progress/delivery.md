@@ -81,9 +81,14 @@ Priority is **consequence, not effort** — "what happens to the evaluation if t
 
 ## 🟡 Wave 2 — what the evaluator will poke at
 
-- [ ] **Ranking and history API** — typed contracts, Axios client, TanStack Query hooks, MSW
-  handlers over a localStorage-backed db, fixtures for other players, ranking scoped by config
-  with deterministic tie-break · **#12**
+- [x] **Ranking and history API** — typed contracts validated on every response, one Axios
+  instance, a repository that only maps endpoints, TanStack Query options and hooks (retries only
+  for timeouts, lost connections and 5xx; refetch when a tab reopens; previous page kept while
+  paging), MSW handlers over a localStorage-backed db shared by browser and tests, seeded fixtures
+  for other players. Ranking scoped by the saved options; ties go to the earlier match, then the
+  match id. Late responses lose to newer data through a revision on every page. The local player
+  gets a stable id and name. Built test-first; added component tests (jsdom + Testing Library) as
+  a pyramid layer between unit and E2E · **#12**
 - [ ] **Match registration** — idempotent submit (client-generated match id), pending queue that
   survives failures and refresh, retry, playable while pending · **#13**
 - [ ] **Network scenarios** — selectable, reproducible MSW scenarios (empty, paged, slow, jittered,
@@ -118,6 +123,9 @@ Priority is **consequence, not effort** — "what happens to the evaluation if t
 - [x] **Enemies circling behind islands** — with the new layout, local avoidance rules pinned a
   Chaser against a coast or sent it circling below an island; replaced by corner waypoints from a
   one-hop visibility graph re-run each step · **#33**
+- [x] **Unit tests next to the code** — moved from the `tests/unit/` mirror into a `test/` folder
+  beside each module, so moving or deleting a module shows its test in the same diff; the testing
+  principles are written into `CONTRIBUTING.md` · **#37**
 
 ## Suggested sequence
 
