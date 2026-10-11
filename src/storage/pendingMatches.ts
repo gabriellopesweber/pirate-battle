@@ -5,15 +5,17 @@ import { local, readJson, writeJson } from '@/storage/local'
  * Completed matches whose registration the server has not confirmed yet.
  * A match enters before its first send and leaves only on a confirmed
  * response, so a failure, a timeout or a refresh in between never loses it.
- * Subscribable, so React can read it with useSyncExternalStore.
+ * Subscribable, so React can read it with useSyncExternalStore. Members are
+ * plain functions, not methods: they never use `this`, so they can be passed
+ * around loose (`useSyncExternalStore(pendingMatches.subscribe, …)`).
  */
 export interface PendingStore {
   /** In the order the matches ended. Same array until something changes. */
-  list(): readonly MatchRecord[]
-  has(matchId: string): boolean
-  add(record: MatchRecord): void
-  remove(matchId: string): void
-  subscribe(listener: () => void): () => void
+  list: () => readonly MatchRecord[]
+  has: (matchId: string) => boolean
+  add: (record: MatchRecord) => void
+  remove: (matchId: string) => void
+  subscribe: (listener: () => void) => () => void
 }
 
 interface PendingStoreOptions {
