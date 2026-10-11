@@ -1,5 +1,5 @@
 import { expect, type Page, test } from '@playwright/test'
-import { type Harness, hold, requireState, startTestMatch, state, step } from './harness'
+import { type Harness, hold, requireState, sampleWhileHolding, startTestMatch, state, step } from './harness'
 
 // Flows 6, 7 and 8 of the brief: ending by time and by sinking with the
 // simulation stopped, a clean restart, pause and focus loss without the
@@ -11,13 +11,10 @@ test.beforeEach(({ isMobile }) => {
 
 const resultFacts = (page: Page) => page.locator('.result__facts')
 
-/** Steps an idle match until it ends, a second at a time. */
+/** Steps an idle match until it ends — inside the page, in one round trip. */
 async function stepUntilOver(page: Page, maxSeconds: number) {
-  for (let s = 0; s < maxSeconds; s++) {
-    const now = await step(page, 1)
-    if (!now || now.status === 'ended') return
-  }
-  throw new Error(`still running after ${String(maxSeconds)} s`)
+  const samples = await sampleWhileHolding(page, [], maxSeconds, 1)
+  if (samples.at(-1)?.status !== 'ended') throw new Error(`still running after ${String(maxSeconds)} s`)
 }
 
 /**

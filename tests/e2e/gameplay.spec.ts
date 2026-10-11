@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { aimAt, angleDelta, distance, hold, startTestMatch, step } from './harness'
+import { aimAt, angleDelta, distance, hold, sampleWhileHolding, startTestMatch, step } from './harness'
 
 // Flow 3 of the brief: movement, rotation, arena bounds and islands — driven
 // by the real keyboard, observed through the test instrumentation.
@@ -52,15 +52,12 @@ test('sailing straight at an island reaches its coast and slides along it, never
 
   // Sampled along the way: hitting a coast at an angle slides the ship along it
   // (by design), so the check is the whole path, not where it ends.
-  let closest = Number.POSITIVE_INFINITY
-  await page.keyboard.down('KeyW')
-  for (let i = 0; i < 40; i++) {
-    const now = await step(page, 0.1)
-    if (!now) throw new Error('no match')
+  const path = await sampleWhileHolding(page, ['KeyW'], 4, 0.1)
+  expect(path).toHaveLength(40)
+  path.forEach((now, i) => {
     expect(now.player.onLand, `on land after ${String((i + 1) / 10)} s`).toBe(false)
-    closest = Math.min(closest, toBox(now.player.position, island))
-  }
-  await page.keyboard.up('KeyW')
+  })
+  const closest = Math.min(...path.map((now) => toBox(now.player.position, island)))
 
   // It reached the coast — as close as its hull allows — without crossing it.
   expect(closest).toBeGreaterThanOrEqual(start.player.radius - 1)

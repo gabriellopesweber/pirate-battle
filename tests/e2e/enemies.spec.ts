@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { distance, requireState, startTestMatch, step } from './harness'
+import { distance, sampleWhileHolding, startTestMatch, step } from './harness'
 
 // Flow 5 of the brief: Chaser and Shooter behaviour and the spawn interval.
 // The player stays still; the enemies act on their own.
@@ -21,55 +21,48 @@ test('enemies spawn at the configured interval, and both kinds appear', async ({
 
 test('a Chaser closes in, explodes on contact, and scores nothing', async ({ page }) => {
   await startTestMatch(page, { spawnIntervalSeconds: 10 })
-  // Watched from the moment it spawns: one of the first two spawns (10 s, 20 s)
-  // is a Chaser, and it may ram within seconds.
-  let now = await step(page, 9.95)
-  let chaser = now?.enemies.find((e) => e.kind === 'chaser')
-  for (let i = 0; i < 50 && !chaser; i++) {
-    now = await step(page, 0.25)
-    chaser = now?.enemies.find((e) => e.kind === 'chaser')
-  }
-  if (!now || !chaser) throw new Error('no Chaser spawned')
-  const chaserId = chaser.id
+  // One of the first two spawns (10 s, 20 s) is a Chaser, and it may ram within
+  // seconds, so the whole stretch is sampled from just before the first.
+  await step(page, 9.95)
+  const samples = await sampleWhileHolding(page, [], 25, 0.25)
 
-  let gap = distance(chaser.position, now.player.position)
-  const healthBefore = now.player.health
-  let rammed = false
-  for (let i = 0; i < 60; i++) {
-    now = await step(page, 0.25)
-    if (!now) throw new Error('no match')
-    const current = now.enemies.find((e) => e.id === chaserId)
-    if (!current) {
-      rammed = true
+  const firstSeen = samples.findIndex((s) => s.enemies.some((e) => e.kind === 'chaser'))
+  expect(firstSeen, 'a Chaser spawned').toBeGreaterThanOrEqual(0)
+  const chaserId = samples.at(firstSeen)?.enemies.find((e) => e.kind === 'chaser')?.id
+  const healthBefore = samples.at(firstSeen)?.player.health ?? 0
+
+  let gap = Number.POSITIVE_INFINITY
+  let rammedAt = -1
+  for (let i = firstSeen; i < samples.length; i++) {
+    const now = samples.at(i)
+    const chaser = now?.enemies.find((e) => e.id === chaserId)
+    if (!now || !chaser) {
+      rammedAt = i
       break
     }
-    const next = distance(current.position, now.player.position)
+    const next = distance(chaser.position, now.player.position)
     expect(next, 'the Chaser keeps closing in').toBeLessThanOrEqual(gap + 1)
     gap = next
   }
 
-  const end = await requireState(page)
-  expect(rammed, 'the Chaser exploded').toBe(true)
-  expect(end.player.health).toBeLessThanOrEqual(healthBefore - 25)
-  expect(end.score).toBe(0)
+  expect(rammedAt, 'the Chaser exploded').toBeGreaterThan(firstSeen)
+  const after = samples.at(rammedAt)
+  expect(after?.player.health).toBeLessThanOrEqual(healthBefore - 25)
+  expect(after?.score).toBe(0)
 })
 
 test('a Shooter closes in and fires once within range', async ({ page }) => {
   await startTestMatch(page, { spawnIntervalSeconds: 10 })
-  let now = await step(page, 20.05)
-  const shooter = now?.enemies.find((e) => e.kind === 'shooter')
-  if (!now || !shooter) throw new Error('no Shooter spawned')
-  const startGap = distance(shooter.position, now.player.position)
+  const start = await step(page, 20.05)
+  const shooter = start?.enemies.find((e) => e.kind === 'shooter')
+  if (!start || !shooter) throw new Error('no Shooter spawned')
+  const startGap = distance(shooter.position, start.player.position)
 
-  let fired = false
-  for (let i = 0; i < 80 && !fired; i++) {
-    now = await step(page, 0.25)
-    if (!now) throw new Error('no match')
-    fired = now.projectiles.some((p) => p.side === 'enemy')
-  }
+  const samples = await sampleWhileHolding(page, [], 20, 0.25)
+  const firing = samples.find((s) => s.projectiles.some((p) => p.side === 'enemy'))
 
-  expect(fired, 'the Shooter opened fire').toBe(true)
-  const at = now.enemies.find((e) => e.id === shooter.id)
-  if (!at) throw new Error('the Shooter is gone')
-  expect(distance(at.position, now.player.position)).toBeLessThan(startGap)
+  expect(firing, 'the Shooter opened fire').toBeDefined()
+  const at = firing?.enemies.find((e) => e.id === shooter.id)
+  if (!firing || !at) throw new Error('the Shooter is gone')
+  expect(distance(at.position, firing.player.position)).toBeLessThan(startGap)
 })

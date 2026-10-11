@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { aimAt, hold, requireState, startTestMatch, step, STEP_SECONDS } from './harness'
+import { engage, hold, requireState, startTestMatch, step, STEP_SECONDS } from './harness'
 
 // Flow 4 of the brief: front and side shots, cooldowns, damage applied once,
 // and score without duplication — fired with the real keys.
@@ -44,22 +44,15 @@ test('each broadside fires three parallel shots, on its own cooldown', async ({ 
 test('shots damage an enemy once per hit, and sinking it scores exactly one point', async ({ page }) => {
   // One enemy at a time: the first spawns at 10 s, the next only at 20 s.
   await startTestMatch(page, { spawnIntervalSeconds: 10, seed: 3 })
-  let now = await step(page, 10.05)
+  const now = await step(page, 10.05)
   const target = now?.enemies[0]
   if (!target) throw new Error('no enemy spawned')
 
-  const healthSeen = new Set<number>([target.health])
-  for (let i = 0; i < 60; i++) {
-    const enemy = now?.enemies.find((e) => e.id === target.id)
-    if (!enemy) break
-    await aimAt(page, enemy.position, 0.05)
-    now = await hold(page, 'Space', 0.2)
-    const after = now?.enemies.find((e) => e.id === target.id)
-    if (after) healthSeen.add(after.health)
-  }
+  const { healthSeen, sunk } = await engage(page, target.id, 12)
 
   const end = await requireState(page)
-  expect(end.enemies.find((e) => e.id === target.id), 'the target was sunk').toBeUndefined()
+  expect(sunk, 'the target was sunk').toBe(true)
+  expect(end.enemies.find((e) => e.id === target.id)).toBeUndefined()
   // Every hit took off exactly one shot's damage (20), never twice.
   for (const health of healthSeen) expect((target.maxHealth - health) % 20).toBe(0)
   expect(end.score).toBe(1)

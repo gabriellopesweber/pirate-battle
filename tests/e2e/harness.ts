@@ -99,3 +99,74 @@ export async function aimAt(page: Page, target: { x: number; y: number }, tolera
   }
   throw new Error('Could not aim at the target')
 }
+
+/**
+ * Holds `codes` for `seconds` of game time and samples the state every
+ * `every` seconds — inside the page, in one round trip; stops early once the
+ * match ends. The key events go to
+ * the same window listener the keyboard feeds. On a slow runner a round trip
+ * per sample outran the test's time limit.
+ */
+export function sampleWhileHolding(
+  page: Page,
+  codes: string[],
+  seconds: number,
+  every: number,
+): Promise<MatchSnapshot[]> {
+  return page.evaluate(
+    ({ codes, seconds, every }) => {
+      const game = (window as unknown as WithHarness).__pirateBattle
+      for (const code of codes) window.dispatchEvent(new KeyboardEvent('keydown', { code }))
+      const samples: MatchSnapshot[] = []
+      for (let t = 0; t < seconds - 1e-9; t += every) {
+        game.step(every)
+        const now = game.state()
+        if (!now) break
+        samples.push(now)
+        if (now.status === 'ended') break
+      }
+      for (const code of codes) window.dispatchEvent(new KeyboardEvent('keyup', { code }))
+      return samples
+    },
+    { codes, seconds, every },
+  )
+}
+
+/**
+ * Chases one enemy with the real controls until it sinks or `maxSeconds` pass:
+ * every 0.2 s of game time, turn toward it and hold the bow cannon. Runs
+ * inside the page in one round trip, like `sampleWhileHolding`. Returns the
+ * enemy's health at each decision, and whether it was sunk.
+ */
+export function engage(
+  page: Page,
+  enemyId: number,
+  maxSeconds: number,
+): Promise<{ healthSeen: number[]; sunk: boolean }> {
+  return page.evaluate(
+    ({ enemyId, maxSeconds }) => {
+      const game = (window as unknown as WithHarness).__pirateBattle
+      const key = (type: 'keydown' | 'keyup', code: string) => {
+        window.dispatchEvent(new KeyboardEvent(type, { code }))
+      }
+      const healthSeen: number[] = []
+      for (let t = 0; t < maxSeconds; t += 0.2) {
+        const now = game.state()
+        const enemy = now?.enemies.find((e) => e.id === enemyId)
+        if (!now || !enemy) return { healthSeen, sunk: now !== null }
+        healthSeen.push(enemy.health)
+        const { position, heading } = now.player
+        const wanted = Math.atan2(enemy.position.y - position.y, enemy.position.x - position.x)
+        const delta = Math.atan2(Math.sin(wanted - heading), Math.cos(wanted - heading))
+        const turnKey = Math.abs(delta) < 0.05 ? null : delta > 0 ? 'KeyD' : 'KeyA'
+        if (turnKey) key('keydown', turnKey)
+        key('keydown', 'Space')
+        game.step(0.2)
+        if (turnKey) key('keyup', turnKey)
+        key('keyup', 'Space')
+      }
+      return { healthSeen, sunk: false }
+    },
+    { enemyId, maxSeconds },
+  )
+}
