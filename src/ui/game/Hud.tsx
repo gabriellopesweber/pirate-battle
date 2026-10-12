@@ -3,6 +3,7 @@ import type { GameSession } from '@/render/GameSession'
 import { useAssets } from '@/ui/assets/AssetsContext'
 import { AtlasSprite } from '@/ui/atlas/AtlasSprite'
 import { frameImage } from '@/ui/atlas/frameImage'
+import { MatchAnnouncer } from '@/ui/game/MatchAnnouncer'
 import { useHud } from '@/ui/game/useHud'
 import { MenuButton } from '@/ui/kit/MenuButton'
 import { Panel } from '@/ui/kit/Panel'
@@ -26,6 +27,7 @@ export function Hud({ session, onRestart, onMainMenu }: HudProps) {
 
   return (
     <>
+      <MatchAnnouncer hud={hud} />
       <div className="hud">
         <div className="hud__health">
           <AtlasSprite sheet={ui} frame="icon_heart" width={32} />

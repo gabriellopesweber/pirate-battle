@@ -57,7 +57,11 @@ test('the whole loop works from the keyboard alone, with visible focus', async (
   await page.keyboard.press('Enter')
   await expect(page.locator('canvas')).toBeVisible({ timeout: 15_000 })
   await expect.poll(() => state(page)).not.toBeNull()
+  // The match's state is read out in a live region, not every frame.
+  const announcer = page.locator('.hud').locator('..').getByRole('status').first()
+  await expect(announcer).toHaveText('Match started. 1:00 left.')
   await page.keyboard.press('KeyP')
+  await expect(announcer).toHaveText('Paused.')
   const dialog = page.getByRole('dialog', { name: 'Paused' })
   await expect(dialog.getByRole('button', { name: 'Resume' })).toBeFocused()
   for (let i = 0; i < 4; i++) {
@@ -67,6 +71,7 @@ test('the whole loop works from the keyboard alone, with visible focus', async (
   await tabTo(page, dialog.getByRole('button', { name: 'Resume' }))
   await page.keyboard.press('Enter')
   await expect(dialog).toBeHidden()
+  await expect(announcer).toHaveText('Resumed.')
 
   // Pausing from the HUD button gives focus back to it on resume.
   await tabTo(page, button(page, 'Pause'))
