@@ -1,0 +1,138 @@
+{
+  "options": {
+    "sessionSeconds": 180,
+    "spawnIntervalSeconds": 1
+  },
+  "seed": 1,
+  "endedBy": "sunk",
+  "lastedSeconds": 15,
+  "frames": {
+    "seconds": 16.08,
+    "frames": 1929,
+    "averageFps": 119.91,
+    "frameTimeMs": {
+      "median": 8.3,
+      "p95": 8.5,
+      "p99": 8.6,
+      "max": 16.6
+    },
+    "framesOver33ms": 0,
+    "lowestSecondFps": 119,
+    "fpsPerSecond": [
+      121,
+      120,
+      120,
+      120,
+      120,
+      120,
+      120,
+      120,
+      120,
+      120,
+      120,
+      120,
+      119,
+      120,
+      120,
+      119
+    ]
+  },
+  "entities": {
+    "max": 10,
+    "average": 7.27,
+    "maxEnemies": 8,
+    "maxProjectiles": 3,
+    "perSecond": [
+      {
+        "time": 1,
+        "enemies": 1,
+        "projectiles": 1,
+        "total": 3
+      },
+      {
+        "time": 2,
+        "enemies": 2,
+        "projectiles": 0,
+        "total": 3
+      },
+      {
+        "time": 3,
+        "enemies": 3,
+        "projectiles": 3,
+        "total": 7
+      },
+      {
+        "time": 4,
+        "enemies": 3,
+        "projectiles": 2,
+        "total": 6
+      },
+      {
+        "time": 5,
+        "enemies": 4,
+        "projectiles": 2,
+        "total": 7
+      },
+      {
+        "time": 6,
+        "enemies": 4,
+        "projectiles": 2,
+        "total": 7
+      },
+      {
+        "time": 7,
+        "enemies": 4,
+        "projectiles": 2,
+        "total": 7
+      },
+      {
+        "time": 8,
+        "enemies": 4,
+        "projectiles": 2,
+        "total": 7
+      },
+      {
+        "time": 9,
+        "enemies": 4,
+        "projectiles": 3,
+        "total": 8
+      },
+      {
+        "time": 10,
+        "enemies": 5,
+        "projectiles": 1,
+        "total": 7
+      },
+      {
+        "time": 11,
+        "enemies": 6,
+        "projectiles": 1,
+        "total": 8
+      },
+      {
+        "time": 12,
+        "enemies": 7,
+        "projectiles": 2,
+        "total": 10
+      },
+      {
+        "time": 13,
+        "enemies": 7,
+        "projectiles": 1,
+        "total": 9
+      },
+      {
+        "time": 14,
+        "enemies": 8,
+        "projectiles": 1,
+        "total": 10
+      },
+      {
+        "time": 15,
+        "enemies": 7,
+        "projectiles": 2,
+        "total": 10
+      }
+    ]
+  }
+}

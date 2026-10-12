@@ -19,7 +19,8 @@
     "test:e2e": "playwright test",
     "test:e2e:update": "playwright test --update-snapshots=changed",
     "test:e2e:report": "playwright show-report",
-    "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm build"
+    "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm build",
+    "profile": "node scripts/profile.mjs"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.104.1",

@@ -125,12 +125,18 @@ Priority is **consequence, not effort** — "what happens to the evaluation if t
   orientation, accessibility, how the game was built (the process and the rules first, then the
   coding agent working within them), asset sources; README with title art and screenshots ·
   **#18**
+- [x] **Performance report** — moved up from wave 3: the brief asks for it outright (§9, §11), so
+  it is a `p2`. `pnpm profile` drives the production build in Chrome with the GPU: 119.9 FPS, frame
+  time p95 8.6 ms over a three-minute match and at the densest spawning (8 enemies, the cap);
+  memory across 15 start/play/exit cycles with heap-snapshot comparison — nothing of a match
+  survives it. The heap growth first seen came from an antivirus script injected into the page;
+  the profiler now blocks every host but localhost. Report and raw data in `docs/performance/` ·
+  **#20**
 
 ## 🟢 Wave 3 — polish
 
-- [ ] **Sound** — effects and ambience loops from the provided WAVs, mute toggle · **#19**
-- [ ] **Performance report** — FPS, p95 frame time and entity count over a 3-minute match;
-  memory over 5 start/play/exit cycles; hardware and browser documented · **#20**
+- [ ] **Sound** — effects and ambience loops from the provided WAVs, mute toggle. The brief makes
+  the files available but asks for no sound; done only if time allows · **#19**
 
 ## Found along the way
 
@@ -160,8 +166,16 @@ Priority is **consequence, not effort** — "what happens to the evaluation if t
   right, each a small triangle as mobile games lay them out; in portrait the old single row did not
   fit (the starboard broadside ended at 428 px on a 412 px screen). An E2E test requires every
   touch button on screen · **#45**
-- [ ] **Component tests timing out under load** — Testing Library's `findBy` gives up after 1 s,
+- [x] **Component tests timing out under load** — Testing Library's `findBy` gives up after 1 s,
   and the first test of each jsdom file pays for starting the environment · **#48**
+- [x] **Build warning: a 623 kB main chunk** — found preparing the profile; React and the data
+  layer got chunks of their own (Rolldown `codeSplitting`), leaving 318 kB, no warning, limit
+  unchanged; grouping PixiJS too merged its on-demand parts into 585 kB, so it keeps its own
+  split · **#56**
+- [x] **Shooters parked against islands** — seen watching the profiling run: a Shooter stopped
+  on distance alone, behind an island too, and fired into the land. It now holds only while it
+  sees the player; a sweep over 25 matches, kept as a test, went from 335 s stalled to none ·
+  **#58**
 
 ## Suggested sequence
 
