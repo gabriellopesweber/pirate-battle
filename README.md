@@ -201,7 +201,7 @@ clears confirmed and pending registrations and the last result, and reloads.
 ## How this was built
 
 **The process came first.** Before any game code, the brief became a delivery plan
-([`docs/plans/in-progress/delivery.md`](docs/plans/in-progress/delivery.md)) and an epic with one
+([`docs/plans/done/delivery.md`](docs/plans/done/delivery.md)) and an epic with one
 issue per deliverable, and the rules of the work were written down in
 [`CONTRIBUTING.md`](CONTRIBUTING.md):
 
