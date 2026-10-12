@@ -43,8 +43,14 @@ export function updateEnemies(world: World, dt: number): void {
 
 function steer(world: World, enemy: Enemy): ShipControls {
   const { player } = world
-  const thrust =
-    enemy.kind === 'chaser' || distance(enemy.position, player.position) > world.config.shooter.preferredDistance
+  // A Shooter holds its distance only while it can see the player: close by
+  // but behind an island, stopping would park it against the coast, so it
+  // keeps sailing round.
+  const holding =
+    enemy.kind === 'shooter' &&
+    distance(enemy.position, player.position) <= world.config.shooter.preferredDistance &&
+    hasLineOfSight(world.arena, enemy.position, player.position, enemy.radius)
+  const thrust = !holding
   const target = waypoint(world.arena, enemy, player.position)
   const error = wrapAngle(angleTo(enemy.position, target) - enemy.heading)
   const turn = Math.abs(error) < AIM_TOLERANCE ? 0 : error > 0 ? 1 : -1
