@@ -192,9 +192,8 @@
 /*
  * A phone on its side (~400 px tall): every screen keeps its main actions in
  * view without scrolling. Buttons sit side by side and shrink, the option
- * fields share a row, and the main menu splits into two columns — actions on
- * the left, the controls on the right; an opened score tab and the network
- * panel follow below, where the panel scrolls.
+ * fields share a row; the main menu's layout follows below, by width. An
+ * opened score tab and the network panel come after, where the panel scrolls.
  */
 @media (max-height: 500px) and (orientation: landscape) {
   .screen {
@@ -242,7 +241,10 @@
     grid-template-columns: repeat(4, minmax(0, 1fr));
     margin: 0.5rem 0;
   }
+}
 
+/* Wide enough on its side: two columns — actions on the left, the controls on the right. */
+@media (max-height: 500px) and (orientation: landscape) and (min-width: 640px) {
   .screen--menu {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr);
@@ -262,5 +264,29 @@
   .screen--menu > [role='tabpanel'],
   .screen--menu > .network {
     grid-column: 1 / -1;
+  }
+}
+
+/*
+ * Narrower still (568 × 320): no room for a second column. One column, with
+ * the actions and the score tabs first and the controls after them, so what
+ * a player needs shows without scrolling.
+ */
+@media (max-height: 500px) and (orientation: landscape) and (max-width: 639.98px) {
+  .screen--menu {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .screen--menu > [role='tabpanel'] {
+    order: 1;
+  }
+
+  .screen--menu > .screen__section {
+    order: 2;
+  }
+
+  .screen--menu > .network {
+    order: 3;
   }
 }

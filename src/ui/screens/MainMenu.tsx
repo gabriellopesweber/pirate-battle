@@ -1,4 +1,4 @@
-import { type KeyboardEvent, useState } from 'react'
+import { type KeyboardEvent, useEffect, useState } from 'react'
 import type { MatchConfig } from '@/api/contracts'
 import { useAssets } from '@/ui/assets/AssetsContext'
 import { AtlasSprite } from '@/ui/atlas/AtlasSprite'
@@ -44,6 +44,12 @@ function moveTabFocus(event: KeyboardEvent<HTMLDivElement>) {
 export function MainMenu({ config, playerId, onPlay, onOptions }: MainMenuProps) {
   const { ui } = useAssets()
   const [tab, setTab] = useState<Tab | null>(null)
+
+  // On a short screen the opened tab lands below the fold; bring it into view
+  // so the tap visibly does something. Where it already shows, nothing moves.
+  useEffect(() => {
+    if (tab) document.getElementById(`panel-${tab}`)?.scrollIntoView({ block: 'nearest' })
+  }, [tab])
 
   return (
     <Panel className="screen screen--menu">

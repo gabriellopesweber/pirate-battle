@@ -25,6 +25,9 @@
 
 
 .controls-card {
+  /* Its own width, not the screen's, decides the columns: on a phone on its
+     side the card shares the menu with the buttons. */
+  container-type: inline-size;
   display: grid;
   gap: 0.4rem;
   width: 100%;
@@ -87,7 +90,8 @@
   line-height: 1;
 }
 
-@media (max-width: 26rem) {
+/* Two columns need about 22rem: a 3.7rem key column and the longest action ("Bow cannon") each. */
+@container (max-width: 22rem) {
   .controls-card__grid {
     grid-template-columns: 1fr;
   }
