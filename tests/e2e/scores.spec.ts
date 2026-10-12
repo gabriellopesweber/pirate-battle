@@ -1,5 +1,5 @@
 import { expect, type Page, test } from '@playwright/test'
-import { sampleWhileHolding, startTestMatch } from './harness'
+import { sampleWhileHolding, startTestMatch, state } from './harness'
 import { chooseScenario, openMenu, openTab, tabPanel } from './helpers'
 
 // Flows 10, 11 and 12 of the brief: the score tabs through loading, empty,
@@ -140,6 +140,34 @@ test.describe('flow 11: registering a match', () => {
     await expect(history.locator('tbody tr')).toHaveCount(1, { timeout: 15_000 })
     await page.reload()
     await expect(page.getByRole('button', { name: 'Play' })).toBeVisible({ timeout: 15_000 })
+    await expect((await openTab(page, 'Match History')).locator('tbody tr')).toHaveCount(1)
+  })
+  test('a new match starts while a registration is still pending, which is sent later', async ({ page }) => {
+    test.setTimeout(90_000)
+    await playUntilSunk(page, 'register-offline')
+    await expect(registration(page)).toHaveText(/^Not saved: Could not reach the server/, { timeout: 15_000 })
+    const pending = () =>
+      page.evaluate(() => (JSON.parse(localStorage.getItem('pirate-battle:pending-matches') ?? '[]') as unknown[]).length)
+    expect(await pending()).toBe(1)
+
+    // Straight from the result screen…
+    await page.getByRole('button', { name: 'Play Again' }).click()
+    await expect(page.locator('canvas')).toBeVisible({ timeout: 15_000 })
+    await expect.poll(async () => (await state(page))?.status).toBe('running')
+    expect(await pending()).toBe(1)
+
+    // …and from the menu, after leaving that match.
+    await page.getByRole('button', { name: 'Pause' }).click()
+    await page.getByRole('dialog', { name: 'Paused' }).getByRole('button', { name: 'Main Menu' }).click()
+    await page.getByRole('button', { name: 'Play' }).click()
+    await expect(page.locator('canvas')).toBeVisible({ timeout: 15_000 })
+    expect(await pending()).toBe(1)
+
+    // Back at the menu with the server up again, the pending match goes through.
+    await page.getByRole('button', { name: 'Pause' }).click()
+    await page.getByRole('dialog', { name: 'Paused' }).getByRole('button', { name: 'Main Menu' }).click()
+    await chooseScenario(page, 'Success')
+    await expect.poll(pending, { timeout: 15_000 }).toBe(0)
     await expect((await openTab(page, 'Match History')).locator('tbody tr')).toHaveCount(1)
   })
 })
