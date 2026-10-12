@@ -186,8 +186,11 @@ same `moveShip` as the player, so they obey the same speeds, turn rates and isla
 - **Chaser** — always under thrust, turns towards the player. On contact it deals
   `contactDamage` and explodes (`resolveRams` in `combat.ts`). The explosion is a `destroyed`
   event with cause `ram`, which scores nothing.
-- **Shooter** — approaches until `preferredDistance`, then coasts. While the player is within
-  `attackRange` it fires aimed shots at its weapon's cooldown.
+- **Shooter** — approaches until `preferredDistance`, then coasts — but only while it can see the
+  player: close by yet behind an island, it keeps sailing round (#58). Stopping on distance alone
+  parked Shooters against the coast, firing into the land; a sweep over whole matches with the
+  player jumping around found 335 s of that in 25 matches, and none after. While the player is
+  within `attackRange` it fires aimed shots at its weapon's cooldown.
 
 **Getting around islands.** While the player is in sight — a ship-wide line to it crosses no land —
 an enemy steers straight at it; a ship turns in place, so pointing its bow never collides, and

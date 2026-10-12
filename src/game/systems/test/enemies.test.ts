@@ -127,6 +127,24 @@ describe('Shooter', () => {
     expect(gap).toBeGreaterThan(preferredDistance - 60)
   })
 
+  it('keeps sailing round an island that hides a player already within its preferred distance', () => {
+    const world = createWorld(testConfig(), 1)
+    // Player north of the 3 × 3 island (x 192-384, y 128-320), Shooter just south
+    // of it: 290 px apart — inside the preferred 300 — with the island between.
+    world.player.position = { x: 288, y: 60 }
+    const shooter = place(world, 'shooter', { x: 288, y: 350 })
+    expect(distance(shooter.position, world.player.position)).toBeLessThan(DEFAULT_GAME_CONFIG.shooter.preferredDistance)
+    expect(hasLineOfSight(world.arena, shooter.position, world.player.position, shooter.radius)).toBe(false)
+    let sawThePlayer = false
+
+    run(world, 8, () => {
+      expect(circleHitsLand(world.arena, shooter.position, shooter.radius)).toBe(false)
+      sawThePlayer ||= hasLineOfSight(world.arena, shooter.position, world.player.position, shooter.radius)
+    })
+
+    expect(sawThePlayer).toBe(true)
+  })
+
   it('fires only within attack range, aimed at the player, at its cooldown', () => {
     const config = testConfig((c) => {
       c.shooter = { ...c.shooter, maxSpeed: 0, acceleration: 0, turnSpeed: 0 }
