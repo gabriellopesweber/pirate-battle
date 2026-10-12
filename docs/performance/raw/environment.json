@@ -1,0 +1,12 @@
+{
+  "date": "2026-10-12T02:35:16.049Z",
+  "os": "Windows_NT 10.0.26200 (x64)",
+  "cpu": "12th Gen Intel(R) Core(TM) i5-1235U",
+  "logicalCores": 12,
+  "memoryGb": 16,
+  "browser": "Google Chrome 154.0.8037.98",
+  "gpu": "ANGLE (Intel, Intel(R) Iris(R) Xe Graphics (0x000046A8) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+  "viewport": "1920 × 1080",
+  "devicePixelRatio": 1.0000000149011612,
+  "build": "production (`pnpm build`, served by `vite preview`)"
+}

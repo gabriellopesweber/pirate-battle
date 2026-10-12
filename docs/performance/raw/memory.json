@@ -1,0 +1,259 @@
+{
+  "cycles": 15,
+  "playSecondsPerCycle": 15,
+  "options": {
+    "sessionSeconds": 180,
+    "spawnIntervalSeconds": 10
+  },
+  "samples": [
+    {
+      "label": "menu, before any match",
+      "jsHeapUsedMb": 6.49,
+      "domNodes": 90,
+      "nodesInDocument": 47,
+      "eventListeners": 170,
+      "canvases": 0
+    },
+    {
+      "label": "menu, after cycle 1",
+      "jsHeapUsedMb": 7.97,
+      "domNodes": 344,
+      "nodesInDocument": 100,
+      "eventListeners": 193,
+      "canvases": 0,
+      "requests": {
+        "game": 3,
+        "external": 0
+      }
+    },
+    {
+      "label": "menu, after cycle 2",
+      "jsHeapUsedMb": 8.18,
+      "domNodes": 344,
+      "nodesInDocument": 100,
+      "eventListeners": 193,
+      "canvases": 0,
+      "requests": {
+        "game": 0,
+        "external": 0
+      }
+    },
+    {
+      "label": "menu, after cycle 3",
+      "jsHeapUsedMb": 8.31,
+      "domNodes": 344,
+      "nodesInDocument": 100,
+      "eventListeners": 193,
+      "canvases": 0,
+      "requests": {
+        "game": 0,
+        "external": 0
+      }
+    },
+    {
+      "label": "menu, after cycle 4",
+      "jsHeapUsedMb": 8.4,
+      "domNodes": 344,
+      "nodesInDocument": 100,
+      "eventListeners": 193,
+      "canvases": 0,
+      "requests": {
+        "game": 0,
+        "external": 0
+      }
+    },
+    {
+      "label": "menu, after cycle 5",
+      "jsHeapUsedMb": 8.54,
+      "domNodes": 344,
+      "nodesInDocument": 100,
+      "eventListeners": 193,
+      "canvases": 0,
+      "requests": {
+        "game": 0,
+        "external": 0
+      }
+    },
+    {
+      "label": "menu, after cycle 6",
+      "jsHeapUsedMb": 8.58,
+      "domNodes": 344,
+      "nodesInDocument": 100,
+      "eventListeners": 193,
+      "canvases": 0,
+      "requests": {
+        "game": 0,
+        "external": 0
+      }
+    },
+    {
+      "label": "menu, after cycle 7",
+      "jsHeapUsedMb": 8.61,
+      "domNodes": 344,
+      "nodesInDocument": 100,
+      "eventListeners": 193,
+      "canvases": 0,
+      "requests": {
+        "game": 0,
+        "external": 0
+      }
+    },
+    {
+      "label": "menu, after cycle 8",
+      "jsHeapUsedMb": 8.63,
+      "domNodes": 344,
+      "nodesInDocument": 100,
+      "eventListeners": 193,
+      "canvases": 0,
+      "requests": {
+        "game": 0,
+        "external": 0
+      }
+    },
+    {
+      "label": "menu, after cycle 9",
+      "jsHeapUsedMb": 8.92,
+      "domNodes": 344,
+      "nodesInDocument": 100,
+      "eventListeners": 193,
+      "canvases": 0,
+      "requests": {
+        "game": 0,
+        "external": 0
+      }
+    },
+    {
+      "label": "menu, after cycle 10",
+      "jsHeapUsedMb": 8.95,
+      "domNodes": 344,
+      "nodesInDocument": 100,
+      "eventListeners": 193,
+      "canvases": 0,
+      "requests": {
+        "game": 0,
+        "external": 0
+      }
+    },
+    {
+      "label": "menu, after cycle 11",
+      "jsHeapUsedMb": 8.99,
+      "domNodes": 344,
+      "nodesInDocument": 100,
+      "eventListeners": 193,
+      "canvases": 0,
+      "requests": {
+        "game": 0,
+        "external": 0
+      }
+    },
+    {
+      "label": "menu, after cycle 12",
+      "jsHeapUsedMb": 9.02,
+      "domNodes": 344,
+      "nodesInDocument": 100,
+      "eventListeners": 193,
+      "canvases": 0,
+      "requests": {
+        "game": 0,
+        "external": 0
+      }
+    },
+    {
+      "label": "menu, after cycle 13",
+      "jsHeapUsedMb": 9.05,
+      "domNodes": 344,
+      "nodesInDocument": 100,
+      "eventListeners": 193,
+      "canvases": 0,
+      "requests": {
+        "game": 0,
+        "external": 0
+      }
+    },
+    {
+      "label": "menu, after cycle 14",
+      "jsHeapUsedMb": 9.07,
+      "domNodes": 344,
+      "nodesInDocument": 100,
+      "eventListeners": 193,
+      "canvases": 0,
+      "requests": {
+        "game": 0,
+        "external": 0
+      }
+    },
+    {
+      "label": "menu, after cycle 15",
+      "jsHeapUsedMb": 9.08,
+      "domNodes": 344,
+      "nodesInDocument": 100,
+      "eventListeners": 193,
+      "canvases": 0,
+      "requests": {
+        "game": 0,
+        "external": 0
+      }
+    }
+  ],
+  "heapGrowthBetweenCycles": {
+    "from": 5,
+    "to": 15,
+    "topGrowth": [
+      {
+        "name": "object:Object",
+        "count": 204,
+        "kb": 5.23
+      },
+      {
+        "name": "closure:",
+        "count": 96,
+        "kb": 2.63
+      },
+      {
+        "name": "array:",
+        "count": 33,
+        "kb": 2.01
+      },
+      {
+        "name": "object:Generator",
+        "count": 32,
+        "kb": 1.75
+      },
+      {
+        "name": "array:(object elements)",
+        "count": 34,
+        "kb": 1.25
+      },
+      {
+        "name": "object:Promise",
+        "count": 64,
+        "kb": 1.25
+      },
+      {
+        "name": "object:system / Context / scope @459",
+        "count": 32,
+        "kb": 0.63
+      },
+      {
+        "name": "object:Array",
+        "count": 30,
+        "kb": 0.47
+      },
+      {
+        "name": "object:a",
+        "count": 10,
+        "kb": 0.23
+      },
+      {
+        "name": "object:Y",
+        "count": 10,
+        "kb": 0.23
+      },
+      {
+        "name": "array:(object properties)",
+        "count": 2,
+        "kb": -0.41
+      }
+    ]
+  }
+}

@@ -80,6 +80,7 @@ checkout runs without any private service.
 | `pnpm test:e2e:update` | Refresh visual baselines (on Linux; see below) |
 | `pnpm test:e2e:report` | Open the last HTML report |
 | `pnpm check` | lint + typecheck + unit + build |
+| `pnpm profile` | Performance profile of the production build in Chrome (after `pnpm build`) — see [`docs/performance/`](docs/performance) |
 
 **Tests.** Unit and component tests (Vitest) live next to the code, in `src/**/test/`. The
 Playwright suite in `tests/e2e/` runs against the production build, on desktop and mobile Chromium;
@@ -227,5 +228,7 @@ decision are in `ARCHITECTURE.md`, the plan and the pull requests.
 - [`ARCHITECTURE.md`](ARCHITECTURE.md) — how the game is put together and why
 - [`assets/README.md`](assets/README.md) — where the art and sound come from, their license, and
   what the build derives from them
+- [`docs/performance/`](docs/performance) — performance report: 120 FPS (p95 8.6 ms) in a
+  three-minute match and at the densest spawning, memory across 15 match cycles, raw data
 - [`CONTRIBUTING.md`](CONTRIBUTING.md) — workflow: issues, branches, commits, pull requests
 - [`docs/plans/`](docs/plans) — delivery plan and its status
