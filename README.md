@@ -133,6 +133,11 @@ ships stop stays visible — and the HUD wraps to two rows. On its side, menus s
 layout so every main action shows without scrolling, down to 568 × 320. Turning the device mid-match
 re-fits the view; the rules do not change.
 
+**Browsers:** the whole suite runs in Chromium (desktop and mobile), as the brief asks. Before
+delivery the game was also opened in Firefox, desktop Safari and iPhone Safari (Playwright's
+Firefox and WebKit): it loads, shows the ranking, starts a match and survives a refresh, with no
+console errors.
+
 **Accessibility:** menus work from the keyboard alone, with a visible focus ring; the pause dialog
 keeps focus inside it and gives it back when closed; the score tabs move with the arrow keys. Score,
 time and match state are also read out by a live region — on the start, pause, resume, each point
@@ -201,7 +206,7 @@ clears confirmed and pending registrations and the last result, and reloads.
 ## How this was built
 
 **The process came first.** Before any game code, the brief became a delivery plan
-([`docs/plans/in-progress/delivery.md`](docs/plans/in-progress/delivery.md)) and an epic with one
+([`docs/plans/done/delivery.md`](docs/plans/done/delivery.md)) and an epic with one
 issue per deliverable, and the rules of the work were written down in
 [`CONTRIBUTING.md`](CONTRIBUTING.md):
 

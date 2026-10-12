@@ -4,8 +4,11 @@
 > Playwright). Deadline: **2026-10-12 09:25 (BRT)** — two days from 2026-10-10 09:25.
 > Scope: everything the brief scores. What gets cut is written down below, never dropped silently.
 
-> **Status: 🚧 in progress.** Epic **#1** with 19 sub-issues (#2–#20). Project scaffold and CI
-> workflow in place; deployed to Vercel (#2 ✅).
+> **Status: ✅ delivered 2026-10-12.** Epic **#1** closed: the 19 planned deliverables (#2–#20)
+> and 15 issues found along the way, each with its own pull request. Live at
+> https://gabriellopesweber-pirate-battle.vercel.app, deployed from `main`. What changed from the
+> plan is under *Divergences* in #1; the sections below keep the plan as it was worked, item by
+> item.
 
 ## Legend
 
@@ -179,6 +182,12 @@ Priority is **consequence, not effort** — "what happens to the evaluation if t
   on distance alone, behind an island too, and fired into the land. It now holds only while it
   sees the player; a sweep over 25 matches, kept as a test, went from 335 s stalled to none ·
   **#58**
+- [x] **The Shooter sweep timing out under load** — about 5 s alone, 15.9 s beside the whole
+  suite; it got its own budget, as the spawner sweep had · **#61**
+- [x] **Broadside not worth using** — from play-testing: at 1.4 s it dealt half the bow cannon's
+  damage per second while asking more; now 0.9 s, one config value · **#63**
+- [x] **No test for a match starting while a registration is pending** — brief §5 states it; the
+  code never blocked it, the final review found no test showing it · **#66**
 
 ## Suggested sequence
 
