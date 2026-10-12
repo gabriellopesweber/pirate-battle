@@ -19,7 +19,8 @@ const STALL_SECONDS = 2
 const STALL_DISTANCE = 10
 
 describe('Shooters across many matches', () => {
-  it('never sit still against an island while it hides the player', () => {
+  // A sweep: about 5 s alone, three times that beside the rest of the suite (#61).
+  it('never sit still against an island while it hides the player', { timeout: 60_000 }, () => {
     const config = structuredClone(DEFAULT_GAME_CONFIG)
     config.spawn.intervalSeconds = 2
     // The player outlives the run, so every Shooter keeps a target to reach.
