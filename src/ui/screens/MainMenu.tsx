@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { type KeyboardEvent, useEffect, useState } from 'react'
 import type { MatchConfig } from '@/api/contracts'
 import { useAssets } from '@/ui/assets/AssetsContext'
 import { AtlasSprite } from '@/ui/atlas/AtlasSprite'
@@ -24,12 +24,35 @@ interface MainMenuProps {
   onOptions: () => void
 }
 
+const TAB_KEYS: Record<string, (index: number) => number> = {
+  ArrowRight: (index) => (index + 1) % TABS.length,
+  ArrowLeft: (index) => (index - 1 + TABS.length) % TABS.length,
+  Home: () => 0,
+  End: () => TABS.length - 1,
+}
+
+/** Arrow keys, Home and End move focus between the tabs; Enter or Space opens one. */
+function moveTabFocus(event: KeyboardEvent<HTMLDivElement>) {
+  const next = TAB_KEYS[event.key]
+  const index = TABS.findIndex(({ id }) => document.activeElement?.id === `tab-${id}`)
+  if (!next || index < 0) return
+  event.preventDefault()
+  const target = TABS[next(index)]
+  if (target) document.getElementById(`tab-${target.id}`)?.focus()
+}
+
 export function MainMenu({ config, playerId, onPlay, onOptions }: MainMenuProps) {
   const { ui } = useAssets()
   const [tab, setTab] = useState<Tab | null>(null)
 
+  // On a short screen the opened tab lands below the fold; bring it into view
+  // so the tap visibly does something. Where it already shows, nothing moves.
+  useEffect(() => {
+    if (tab) document.getElementById(`panel-${tab}`)?.scrollIntoView({ block: 'nearest' })
+  }, [tab])
+
   return (
-    <Panel className="screen">
+    <Panel className="screen screen--menu">
       <h1 className="screen__title-art">
         <AtlasSprite sheet={ui} frame="title_pirate_battle" width={260} />
         <span className="visually-hidden">Pirate Battle</span>
@@ -48,7 +71,7 @@ export function MainMenu({ config, playerId, onPlay, onOptions }: MainMenuProps)
         <ControlsCard />
       </section>
 
-      <div role="tablist" aria-label="Scores" className="screen__tabs">
+      <div role="tablist" aria-label="Scores" className="screen__tabs" onKeyDown={moveTabFocus}>
         {TABS.map(({ id, label }) => (
           <MenuButton
             key={id}

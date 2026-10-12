@@ -32,6 +32,12 @@ challenge instructs ("use the provided assets as the visual base"). No third-par
 | `vector/` (`.svg`, `.swf`) | Editable source art, not used at runtime |
 | `sample*.png`, `preview.png`, `logo_jungle_gaming.svg` | Reference images from the brief, not game art |
 
+## Derived and committed
+
+- **`public/favicon.png`** (128 × 128): the player's ship, `ship_5` of the ships atlas, turned 45°
+  so it fills a square tab icon. Drawn once from the atlas on a canvas and committed as is — it
+  never changes, and producing it in the build would need an image library for one sprite.
+
 ## Conversions done by the build script
 
 - **Ships atlas: XML → Pixi JSON.** The ships atlas is a Starling/Sparrow `TextureAtlas` XML, which
