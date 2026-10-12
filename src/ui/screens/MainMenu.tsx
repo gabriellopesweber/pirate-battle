@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { type KeyboardEvent, useState } from 'react'
 import type { MatchConfig } from '@/api/contracts'
 import { useAssets } from '@/ui/assets/AssetsContext'
 import { AtlasSprite } from '@/ui/atlas/AtlasSprite'
@@ -22,6 +22,23 @@ interface MainMenuProps {
   playerId: string
   onPlay: () => void
   onOptions: () => void
+}
+
+const TAB_KEYS: Record<string, (index: number) => number> = {
+  ArrowRight: (index) => (index + 1) % TABS.length,
+  ArrowLeft: (index) => (index - 1 + TABS.length) % TABS.length,
+  Home: () => 0,
+  End: () => TABS.length - 1,
+}
+
+/** Arrow keys, Home and End move focus between the tabs; Enter or Space opens one. */
+function moveTabFocus(event: KeyboardEvent<HTMLDivElement>) {
+  const next = TAB_KEYS[event.key]
+  const index = TABS.findIndex(({ id }) => document.activeElement?.id === `tab-${id}`)
+  if (!next || index < 0) return
+  event.preventDefault()
+  const target = TABS[next(index)]
+  if (target) document.getElementById(`tab-${target.id}`)?.focus()
 }
 
 export function MainMenu({ config, playerId, onPlay, onOptions }: MainMenuProps) {
@@ -48,7 +65,7 @@ export function MainMenu({ config, playerId, onPlay, onOptions }: MainMenuProps)
         <ControlsCard />
       </section>
 
-      <div role="tablist" aria-label="Scores" className="screen__tabs">
+      <div role="tablist" aria-label="Scores" className="screen__tabs" onKeyDown={moveTabFocus}>
         {TABS.map(({ id, label }) => (
           <MenuButton
             key={id}

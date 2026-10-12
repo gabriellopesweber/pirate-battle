@@ -1,4 +1,4 @@
-import { type CSSProperties, useEffect, useRef } from 'react'
+import type { CSSProperties } from 'react'
 import type { GameSession } from '@/render/GameSession'
 import { useAssets } from '@/ui/assets/AssetsContext'
 import { AtlasSprite } from '@/ui/atlas/AtlasSprite'
@@ -7,6 +7,7 @@ import { useHud } from '@/ui/game/useHud'
 import { MenuButton } from '@/ui/kit/MenuButton'
 import { Panel } from '@/ui/kit/Panel'
 import { RoundButton } from '@/ui/kit/RoundButton'
+import { useDialogFocus } from '@/ui/kit/useDialogFocus'
 import { formatClock } from '@/ui/format'
 import './Hud.css'
 
@@ -65,15 +66,15 @@ export function Hud({ session, onRestart, onMainMenu }: HudProps) {
               {formatClock(hud.secondsLeft)}
             </span>
           </div>
-          {hud.status === 'running' && (
-            <RoundButton
-              icon="icon_pause"
-              label="Pause"
-              onClick={() => {
-                session.pause('manual')
-              }}
-            />
-          )}
+          {/* Stays mounted while paused, so the dialog can give focus back to it. */}
+          <RoundButton
+            icon="icon_pause"
+            label="Pause"
+            disabled={hud.status !== 'running'}
+            onClick={() => {
+              session.pause('manual')
+            }}
+          />
           <RoundButton icon="icon_restart" label="Restart" onClick={onRestart} />
         </div>
       </div>
@@ -100,21 +101,18 @@ interface PauseDialogProps {
 }
 
 function PauseDialog({ focusLost, onResume, onRestart, onMainMenu }: PauseDialogProps) {
-  const resume = useRef<HTMLButtonElement>(null)
-  useEffect(() => {
-    resume.current?.focus()
-  }, [])
+  const { dialogRef, initialFocusRef } = useDialogFocus<HTMLButtonElement>()
 
   return (
     <div className="hud__overlay">
-      <div role="dialog" aria-modal="true" aria-labelledby="pause-title">
+      <div role="dialog" aria-modal="true" aria-labelledby="pause-title" ref={dialogRef}>
         <Panel className="hud__dialog">
           <h2 id="pause-title" className="screen-title">
             Paused
           </h2>
           <p>{focusLost ? 'Paused while the game was in the background.' : 'Ready when you are.'}</p>
           <div className="button-stack">
-            <MenuButton ref={resume} onClick={onResume}>
+            <MenuButton ref={initialFocusRef} onClick={onResume}>
               Resume
             </MenuButton>
             <MenuButton onClick={onRestart}>Restart</MenuButton>
