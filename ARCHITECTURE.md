@@ -292,7 +292,10 @@ ones and destroying views whose entity is gone; every step it turns events into 
   `splash`, an explosion on `destroyed`, and a fading wreck where an enemy sank. They advance with
   the time the session passes in — zero while paused — so they freeze with the match.
 - **Letterbox:** the world is scaled to fit the canvas at its own aspect ratio and centred, so the
-  whole arena is always visible. Re-laid out whenever the canvas size changes.
+  whole arena is always visible. Re-laid out whenever the canvas size changes. The bands around it
+  (wide on a phone held upright) show the same water, tinted darker, at the arena's scale and
+  origin so the pattern runs on without a seam; the darker tone keeps the arena's edge — where
+  ships stop — visible.
 
 ## Resource management
 
@@ -334,11 +337,60 @@ from the same UI atlas as the game.
   decoded into a `data:` URL, once per frame. Other sprites are CSS backgrounds on the atlas image.
 - **Options** keeps each field as typed text, validates on change, explains invalid values inline
   (`aria-invalid` + described error), and disables Save while anything is invalid.
-- **Pause dialog** offers Resume, Restart and Main Menu, and focuses Resume. The reference image
+- **Pause dialog** offers Resume, Restart and Main Menu; focus handling is under *Accessibility*. The reference image
   also shows Options there; it is left out — the brief does not ask for it, and opening Options
   from combat would mean leaving the match.
 - **Leaving combat** (Main Menu, or a refresh) unmounts the game view, which destroys the session:
   the match is abandoned.
+
+## Layout and orientation
+
+Both orientations are supported on a phone; the brief asks for one to be defined and for no cut-off
+in the arena or the HUD. Everything but the HUD already fitted upright, and supporting only
+landscape would have meant an overlay that also pauses the match on rotation — new logic for a
+worse result.
+
+- **Upright:** the HUD's right-hand group (score, time, pause, restart) wraps below the health bar
+  instead of running off the edge. The arena is letterboxed (see Rendering).
+- **On its side** (`max-height: 500px` and landscape): menus go compact — buttons side by side,
+  the two option fields in one row, result facts in one row. The main menu splits into two columns
+  (actions left, controls right) from 640 px wide; narrower, it stays in one column with the
+  actions and score tabs first. Chosen by the screen's **height**, not by "mobile": a short laptop
+  window gets the same layout for the same reason.
+- **The controls card** picks one or two columns by its **own** width (a container query), not the
+  screen's: on a phone on its side it shares the menu with the buttons and is far narrower than the
+  screen.
+- **An opened score tab scrolls into view** (`block: 'nearest'`): on a short screen it lands below
+  the fold, and a tap that changes nothing on screen looks broken. Where it already shows, nothing
+  moves.
+- Guarded by `tests/e2e/layout.spec.ts`: HUD and arena on screen in both orientations and across a
+  rotation; on a landscape phone the centre of every main action is that action
+  (`elementFromPoint` — catches both off-screen and hidden-under-the-frame); no overlap on iPhone SE,
+  Galaxy S8 and 568 × 320.
+
+## Accessibility
+
+- **Keyboard:** every menu control is a native button, field or select, in reading order, with a
+  visible focus ring. The score tabs follow the WAI-ARIA tabs pattern for movement: arrow keys,
+  Home and End move between them; Enter or Space opens one. `tests/e2e/keyboard.spec.ts` plays the
+  whole menu → Options → Play → pause → result → menu loop from the keyboard alone and checks a
+  focus ring at every Tab stop.
+- **Dialog focus** (`useDialogFocus`): on open, focus moves to Resume; Tab and Shift+Tab cycle
+  inside the dialog; on close, focus goes back to what had it — the HUD's Pause button, which stays
+  mounted (disabled) during the pause for that reason. The result screen focuses Play Again.
+- **Match state, semantically:** the HUD's numbers are text with hidden labels ("Score", "Time
+  left"), the health bar a `meter`. A polite live region (`MatchAnnouncer`) reads out only
+  meaningful changes, decided by a pure function (`announcement`): the start or a restart, pause
+  (and whether focus loss caused it), resume, each new score, and 1 min / 30 s / 10 s left. The
+  clock itself changes every second and is never read out. The end is left to the result screen,
+  which takes focus. A repeated message alternates a trailing no-break space so it is read again.
+- **Errors:** option errors are `role="alert"`, tied to their field with `aria-describedby` and
+  `aria-invalid`; score-tab and asset-load errors are alerts with a retry.
+- **Contrast**, measured, not assumed: a probe hid every text, screenshotted what was behind it,
+  and computed the WCAG ratio of each visible text against those pixels, on every screen. The one
+  failure was the health numbers on the bar (4.1:1 on green, worse on amber); they now sit on a
+  dark pill and pass on all three fills. Everything else measured 6–14:1; the only lower readings
+  were disabled controls, which WCAG exempts.
 
 ## Local persistence
 
@@ -509,5 +561,9 @@ simulating every seed from 1 to 60 with the real rules.
 - **Enemy navigation assumes convex islands:** corner waypoints always get around a box, not
   around arbitrary shapes. Every island in this arena is a box.
 - **Ships overlap each other:** only ship ↔ land and Chaser ↔ player contacts are resolved.
+- **Upright, the arena is small:** it keeps its proportions (25 × 14 tiles, about 16 : 9; the brief
+  asks for them to be preserved), so on a phone held upright it spans the width and takes about a
+  quarter of the height.
+  It stays whole and playable; landscape gives it the full screen.
 - **E2E runs two workers:** each renders the game with software WebGL in headless Chromium; more
   in parallel starved each other and pushed Pixi's start-up past assertion timeouts.

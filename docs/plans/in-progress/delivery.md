@@ -116,10 +116,15 @@ Priority is **consequence, not effort** — "what happens to the evaluation if t
   and one played to its result, each match starting clean) and touch actually driving the ship
   (real touches held while the test clock steps: sail, turn, all three weapons, two thumbs at
   once) · **#51**
-- [ ] **Accessibility** — keyboard menus, visible focus, dialog focus trap, labels, contrast,
-  accessible errors, semantic live status without per-frame announcements, supported orientation ·
-  **#17**
-- [ ] **Final README and ARCHITECTURE** — everything section 11 of the brief lists · **#18**
+- [x] **Accessibility** — keyboard menus with visible focus (the whole loop tested keyboard-only),
+  dialog focus trap and return, arrow keys between the score tabs, a live region that announces
+  only meaningful changes, contrast measured against rendered pixels (the health numbers failed
+  and now sit on a dark pill). Both orientations, compact layouts on a phone on its side, no
+  overlap down to 568 × 320; tab icon from the player's ship · **#17**
+- [x] **Final README and ARCHITECTURE** — every item of section 11 mapped; added devices and
+  orientation, accessibility, how the game was built (the process and the rules first, then the
+  coding agent working within them), asset sources; README with title art and screenshots ·
+  **#18**
 
 ## 🟢 Wave 3 — polish
 

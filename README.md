@@ -1,12 +1,42 @@
-# Pirate Battle
+<p align="center">
+  <img src="docs/images/title.png" alt="Pirate Battle" width="420" />
+</p>
 
-A top-down 2D naval shooter: sail between islands, sink enemy ships and climb the ranking before
-the clock runs out. Built with React, TypeScript and PixiJS.
+<p align="center">
+  A top-down 2D naval shooter: sail between islands, sink enemy ships and climb the ranking before
+  the clock runs out.<br />
+  Built with React, TypeScript and PixiJS.
+</p>
 
-**Live:** https://gabriellopesweber-pirate-battle.vercel.app
+<p align="center">
+  <a href="https://gabriellopesweber-pirate-battle.vercel.app"><strong>▶ Play now</strong></a>
+  &nbsp;·&nbsp;
+  <a href="ARCHITECTURE.md">Architecture</a>
+  &nbsp;·&nbsp;
+  <a href="#network-scenarios">Break the network</a>
+</p>
 
-> 🚧 **Work in progress.** Controls and gameplay configuration will be documented here as they
-> land.
+<p align="center">
+  <a href="https://github.com/gabriellopesweber/pirate-battle/actions/workflows/ci.yml"><img src="https://github.com/gabriellopesweber/pirate-battle/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI" /></a>
+  <a href="https://gabriellopesweber-pirate-battle.vercel.app"><img src="https://img.shields.io/badge/deploy-vercel-000?logo=vercel" alt="Deployed on Vercel" /></a>
+</p>
+
+<p align="center">
+  <img src="docs/images/battle.jpg" alt="A battle: the player's blue ship among islands, a Shooter on fire, a Chaser closing in, cannonballs in the air" width="760" />
+</p>
+
+<table align="center">
+  <tr>
+    <td align="center"><img src="docs/images/menu.jpg" alt="Main menu with controls and score tabs" width="250" /><br /><sub>Main menu</sub></td>
+    <td align="center"><img src="docs/images/result.jpg" alt="Result screen: score, time played, how it ended, saved" width="250" /><br /><sub>Result, registered</sub></td>
+    <td align="center"><img src="docs/images/mobile-landscape.jpg" alt="The match on a phone on its side, with touch controls" width="250" /><br /><sub>Phone, on its side</sub></td>
+    <td align="center"><img src="docs/images/mobile-portrait.jpg" alt="The match on a phone held upright" width="90" /><br /><sub>Upright</sub></td>
+  </tr>
+</table>
+
+## Contents
+
+[Stack](#stack) · [Setup](#setup) · [Commands](#commands) · [Controls](#controls) · [Devices and orientation](#devices-and-orientation) · [Gameplay configuration](#gameplay-configuration) · [Network scenarios](#network-scenarios) · [Environment variables](#environment-variables) · [How this was built](#how-this-was-built) · [Documentation](#documentation)
 
 ## Stack
 
@@ -19,7 +49,7 @@ the clock runs out. Built with React, TypeScript and PixiJS.
 | HTTP client | Axios |
 | API mocking | MSW |
 | E2E and visual regression | Playwright |
-| Unit tests (game rules) | Vitest |
+| Unit and component tests | Vitest + Testing Library |
 | Build | Vite |
 
 ## Setup
@@ -31,7 +61,9 @@ pnpm install
 pnpm dev
 ```
 
-Optionally copy `.env.example` to `.env` — the defaults work out of the box.
+Optionally copy `.env.example` to `.env` — the defaults work out of the box. Nothing else is
+needed: the ranking and history API is mocked in the browser (see *Network scenarios*), so a clean
+checkout runs without any private service.
 
 ## Commands
 
@@ -43,7 +75,7 @@ Optionally copy `.env.example` to `.env` — the defaults work out of the box.
 | `pnpm preview` | Serve the production build |
 | `pnpm lint` | ESLint |
 | `pnpm typecheck` | TypeScript, no emit |
-| `pnpm test` | Unit tests (game rules) |
+| `pnpm test` | Unit and component tests (Vitest) |
 | `pnpm test:e2e` | Playwright, desktop and mobile Chromium |
 | `pnpm test:e2e:update` | Refresh visual baselines (on Linux; see below) |
 | `pnpm test:e2e:report` | Open the last HTML report |
@@ -89,6 +121,20 @@ Moving and firing work together. Game keys are only captured while a match is ru
 match also pauses on its own when the window loses focus or the tab is hidden. Touch buttons show
 on touch screens as two thumb clusters — steering bottom left, weapons bottom right; keyboard
 controls are listed on screen.
+
+## Devices and orientation
+
+Desktop and mobile, in **both orientations** on a phone. Upright, the arena keeps its proportions
+(it is wider than tall), so it sits in the middle with a darker sea around it — the edge where
+ships stop stays visible — and the HUD wraps to two rows. On its side, menus switch to a compact
+layout so every main action shows without scrolling, down to 568 × 320. Turning the device mid-match
+re-fits the view; the rules do not change.
+
+**Accessibility:** menus work from the keyboard alone, with a visible focus ring; the pause dialog
+keeps focus inside it and gives it back when closed; the score tabs move with the arrow keys. Score,
+time and match state are also read out by a live region — on the start, pause, resume, each point
+and at 1 min / 30 s / 10 s left, never per frame. Text contrast was measured against the rendered
+pixels (see `ARCHITECTURE.md` → *Accessibility*).
 
 ## Gameplay configuration
 
@@ -149,8 +195,37 @@ clears confirmed and pending registrations and the last result, and reloads.
 |---|---|---|
 | `VITE_API_BASE_URL` | `/api` | Base URL for the ranking and history API (served by MSW) |
 
+## How this was built
+
+**The process came first.** Before any game code, the brief became a delivery plan
+([`docs/plans/in-progress/delivery.md`](docs/plans/in-progress/delivery.md)) and an epic with one
+issue per deliverable, and the rules of the work were written down in
+[`CONTRIBUTING.md`](CONTRIBUTING.md):
+
+- **The brief is the scope.** Nothing goes in without a requirement asking for it; what gets cut
+  is written down, never dropped silently.
+- **Priority is consequence, not effort** — `p1` playable, deployed and within the mandatory
+  rules; `p2` what the evaluation checks; `p3` polish — so the order of work follows the brief's
+  scoring.
+- **Plans become issues before code**, one branch and one pull request per issue. A defect found
+  along the way gets its own issue, never a silent fix inside another change.
+- **Tests first**, at the right layer: unit tests for the rules, component tests for UI states,
+  Playwright for the brief's flows; test doubles only at the edges.
+- **Gates:** `pnpm check` and the whole E2E suite before every pull request, CI on every pull
+  request, merge only when green.
+
+**Within those rules**, the code was written with [Claude Code](https://claude.com/claude-code),
+Anthropic's coding agent, as a pair programmer. The agent wrote most of the code and tests; the
+author planned each issue, made the calls that were his to make (the order of the work, what to
+cut, the supported orientation, how the game should look), reviewed and approved every commit
+before it was made, and checked the game in the browser on desktop and phone sizes. Every commit
+carries a `Co-Authored-By: Claude` trailer, so the history says it plainly. The reasons behind each
+decision are in `ARCHITECTURE.md`, the plan and the pull requests.
+
 ## Documentation
 
 - [`ARCHITECTURE.md`](ARCHITECTURE.md) — how the game is put together and why
+- [`assets/README.md`](assets/README.md) — where the art and sound come from, their license, and
+  what the build derives from them
 - [`CONTRIBUTING.md`](CONTRIBUTING.md) — workflow: issues, branches, commits, pull requests
 - [`docs/plans/`](docs/plans) — delivery plan and its status
