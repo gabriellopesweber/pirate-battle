@@ -133,4 +133,6 @@ Two defects were found while preparing this report and fixed under their own iss
   land. A Shooter stopped on distance alone, without checking it could see the player. Fixed, with
   a sweep over 25 matches kept as a test: 335 s of stalled Shooters before, none after.
 
-The numbers above were measured after both fixes.
+The numbers above were measured after both fixes, and before the broadside cooldown went from
+1.4 s to 0.9 s (#63): a little more fire from the player, so a few more projectiles at times — the
+stress run's ten entities stay the reference for the densest field.

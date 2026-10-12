@@ -558,6 +558,12 @@ simulating every seed from 1 to 60 with the real rules.
 
 ## Balancing decisions and known limitations
 
+- **Broadside cooldown 0.9 s** (was 1.4 s, #63, from play-testing). At 1.4 s a broadside dealt
+  about 32 damage a second per side — half the bow cannon's 57 — while asking more of the player,
+  who must turn the ship side-on; it was not worth using. At 0.9 s it deals about 50, still under
+  the easier-to-aim bow cannon, and a 45-damage volley still nearly sinks a Shooter (60 health).
+  One value in `gameConfig.ts`; the combat test reads it from there.
+
 - **Islands within 3 × 3 tiles**, six of them, two flanking the player's start as cover — chosen
   so the provided sand art has no seams (see Collisions).
 - **No render interpolation:** motion advances in 60 Hz increments on faster displays.
