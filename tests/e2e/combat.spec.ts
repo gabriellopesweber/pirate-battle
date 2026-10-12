@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test'
 import { engage, hold, requireState, startTestMatch, step, STEP_SECONDS } from './harness'
+import { DEFAULT_GAME_CONFIG } from '../../src/game/config/gameConfig'
 
 // Flow 4 of the brief: front and side shots, cooldowns, damage applied once,
 // and score without duplication — fired with the real keys.
@@ -33,7 +34,9 @@ test('each broadside fires three parallel shots, on its own cooldown', async ({ 
 
   const port = await hold(page, 'KeyQ', STEP_SECONDS)
   expect(port && playerShots(port)).toHaveLength(3)
-  expect(port?.weapons.left).toBeGreaterThan(1)
+  // The cooldown comes from the config, so balancing it never breaks this test.
+  const { cooldownSeconds } = DEFAULT_GAME_CONFIG.player.broadside
+  expect(port?.weapons.left).toBeCloseTo(cooldownSeconds, 2)
   expect(port?.weapons.right).toBe(0)
 
   // The other side is ready at once: its cooldown is separate.

@@ -110,8 +110,12 @@ describe('projectiles', () => {
   it('fall into the sea when their lifetime ends', () => {
     const world = newWorld()
 
-    // Starboard (east) from the spawn: open water for the whole range.
-    const events = hold(world, { fireRight: true }, Math.ceil(broadside.projectileLifetimeSeconds / DT) + 1)
+    // Starboard (east) from the spawn: open water for the whole range. One
+    // volley, then the key released — a held key would fire the next one.
+    const events = [
+      ...hold(world, { fireRight: true }),
+      ...hold(world, {}, Math.ceil(broadside.projectileLifetimeSeconds / DT) + 1),
+    ]
 
     expect(world.projectiles.size).toBe(0)
     const splashes = ofType(events, 'splash')
@@ -124,7 +128,7 @@ describe('projectiles', () => {
     // East of the 3 × 3 island (x 192-384, y 128-320), bow up: port fire heads west into it.
     world.player.position = { x: 600, y: 200 }
 
-    const events = hold(world, { fireLeft: true }, 60)
+    const events = [...hold(world, { fireLeft: true }), ...hold(world, {}, 60)]
 
     const splashes = ofType(events, 'splash')
     expect(splashes).toHaveLength(broadside.projectileCount)
