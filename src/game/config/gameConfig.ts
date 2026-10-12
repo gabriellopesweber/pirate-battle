@@ -141,7 +141,7 @@ export const DEFAULT_GAME_CONFIG: GameConfig = {
       projectileRadius: 6,
     },
     broadside: {
-      cooldownSeconds: 1.4,
+      cooldownSeconds: 0.9,
       damage: 15,
       projectileSpeed: 380,
       projectileLifetimeSeconds: 0.9,
