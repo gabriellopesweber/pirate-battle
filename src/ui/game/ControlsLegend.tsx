@@ -1,5 +1,5 @@
 import type { Action } from '@/input/inputState'
-import { KEY_BINDINGS, PAUSE_KEYS, RESTART_KEYS } from '@/input/keyboard'
+import { KEY_BINDINGS, PAUSE_KEYS, RESTART_KEYS, SOUND_KEYS } from '@/input/keyboard'
 import { useAssets } from '@/ui/assets/AssetsContext'
 import { AtlasSprite } from '@/ui/atlas/AtlasSprite'
 import './ControlsLegend.css'
@@ -9,7 +9,7 @@ interface Entry {
   keys: string
 }
 
-const FULL: readonly Entry[] = [...KEY_BINDINGS, PAUSE_KEYS, RESTART_KEYS]
+const FULL: readonly Entry[] = [...KEY_BINDINGS, PAUSE_KEYS, RESTART_KEYS, SOUND_KEYS]
 
 /** The first key of a binding ('W / ↑' → 'W'); the alternatives are noted below the card. */
 const primaryKey = (keys: string): string => keys.split(' / ')[0] ?? keys
@@ -75,7 +75,7 @@ export function ControlsCard() {
         ))}
       </dl>
       <p className="controls-card__note">
-        Arrows steer too · Esc pauses · touch screens use on-screen buttons
+        Arrows steer too · Esc pauses · M mutes · touch screens use on-screen buttons
       </p>
     </div>
   )

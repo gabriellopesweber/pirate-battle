@@ -3,6 +3,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { createQueryClient } from '@/api/queryClient'
 import { App } from '@/app/App'
+import { unlockSoundOnFirstGesture } from '@/audio/sound'
 import { installTestHarness } from '@/testing/harness'
 import '@/styles/global.css'
 
@@ -13,6 +14,7 @@ const queryClient = createQueryClient()
 
 // Browser-test hooks; does nothing unless the URL has ?test.
 installTestHarness()
+unlockSoundOnFirstGesture()
 
 /**
  * The mock API must be listening before the first request. If it cannot

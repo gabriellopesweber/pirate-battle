@@ -8,6 +8,7 @@ import { Panel } from '@/ui/kit/Panel'
 import { NetworkControls } from '@/ui/network/NetworkControls'
 import { HistoryPanel } from '@/ui/scores/HistoryPanel'
 import { RankingPanel } from '@/ui/scores/RankingPanel'
+import { SoundToggle } from '@/ui/sound/SoundToggle'
 
 type Tab = 'ranking' | 'history'
 
@@ -97,7 +98,12 @@ export function MainMenu({ config, playerId, onPlay, onOptions }: MainMenuProps)
         </div>
       ))}
 
-      <NetworkControls />
+      {/* One row at the foot: a sound button on its own line pushed the menu off a short laptop screen. */}
+      <div className="screen__foot">
+        <NetworkControls />
+        {/* Within the scenario line's height, so the foot row grows no taller. */}
+        <SoundToggle size={40} />
+      </div>
     </Panel>
   )
 }

@@ -117,8 +117,10 @@ docker run --rm --ipc=host -v "$PWD:/work" -v /work/node_modules -w /work \
 | Fire port / starboard broadside | `Q` / `E` | broadside buttons |
 | Pause | `P` / `Esc` | Pause button |
 | Restart | `R` | Restart button |
+| Sound on / off | `M` | Sound button (a speaker) in the HUD, the main menu and the pause dialog |
 
-Moving and firing work together. Game keys are only captured while a match is running; the
+Sound starts with the first click or key press — browsers allow audio only after a gesture — and
+the mute setting is kept across refreshes. Moving and firing work together. Game keys are only captured while a match is running; the
 match also pauses on its own when the window loses focus or the tab is hidden. Touch buttons show
 on touch screens as two thumb clusters — steering bottom left, weapons bottom right; keyboard
 controls are listed on screen.

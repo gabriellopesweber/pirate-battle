@@ -11,13 +11,14 @@ function setup() {
   const input = new InputState()
   const onPause = vi.fn()
   const onRestart = vi.fn()
-  const unbind = bindKeyboard(target, input, { onPause, onRestart })
+  const onToggleSound = vi.fn()
+  const unbind = bindKeyboard(target, input, { onPause, onRestart, onToggleSound })
   const send = (type: 'keydown' | 'keyup', code: string, repeat = false) => {
     const event = key(type, code, repeat)
     target.dispatchEvent(event)
     return event
   }
-  return { target, input, onPause, onRestart, unbind, send }
+  return { target, input, onPause, onRestart, onToggleSound, unbind, send }
 }
 
 describe('InputState', () => {
@@ -111,6 +112,15 @@ describe('bindKeyboard', () => {
     send('keydown', 'KeyR', true)
 
     expect(onRestart).toHaveBeenCalledOnce()
+  })
+
+  it('turns the sound on and off on M, once per press', () => {
+    const { onToggleSound, send } = setup()
+
+    send('keydown', 'KeyM')
+    send('keydown', 'KeyM', true)
+
+    expect(onToggleSound).toHaveBeenCalledOnce()
   })
 
   it('releases every held key and stops listening once unbound', () => {

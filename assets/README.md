@@ -38,6 +38,13 @@ challenge instructs ("use the provided assets as the visual base"). No third-par
   so it fills a square tab icon. Drawn once from the atlas on a canvas and committed as is — it
   never changes, and producing it in the build would need an image library for one sprite.
 
+## Drawn for this game
+
+- **`public/icons/sound-on.svg`, `sound-off.svg`**: a speaker, with waves or crossed out, for the
+  sound toggle — the UI atlas has no such icon. Drawn as SVG in the atlas icons' style (dark rim,
+  gold body, cream core), with gradients matched to them by eye; shown inside the atlas's own
+  round button.
+
 ## Conversions done by the build script
 
 - **Ships atlas: XML → Pixi JSON.** The ships atlas is a Starling/Sparrow `TextureAtlas` XML, which
