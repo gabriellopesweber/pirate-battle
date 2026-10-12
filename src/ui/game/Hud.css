@@ -31,6 +31,13 @@
   background: center / 100% 100% no-repeat;
 }
 
+/* The numbers sit on a dark pill: legible on the green, amber and red fills alike. */
+.hud__bar-text > span {
+  padding: 0 0.35rem;
+  border-radius: 0.5rem;
+  background: rgb(0 0 0 / 0.55);
+}
+
 .hud__bar-fill {
   position: absolute;
   inset: 0;

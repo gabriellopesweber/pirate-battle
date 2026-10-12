@@ -48,7 +48,9 @@ export function Hud({ session, onRestart, onMainMenu }: HudProps) {
               }}
             />
             <span className="hud__bar-text">
-              {hud.health} / {hud.maxHealth}
+              <span>
+                {hud.health} / {hud.maxHealth}
+              </span>
             </span>
           </div>
         </div>
