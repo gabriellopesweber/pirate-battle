@@ -10,6 +10,7 @@ import { Panel } from '@/ui/kit/Panel'
 import { RoundButton } from '@/ui/kit/RoundButton'
 import { useDialogFocus } from '@/ui/kit/useDialogFocus'
 import { formatClock } from '@/ui/format'
+import { SoundToggle } from '@/ui/sound/SoundToggle'
 import './Hud.css'
 
 interface HudProps {
@@ -80,6 +81,7 @@ export function Hud({ session, onRestart, onMainMenu }: HudProps) {
             }}
           />
           <RoundButton icon="icon_restart" label="Restart" onClick={onRestart} />
+          <SoundToggle />
         </div>
       </div>
 
@@ -122,6 +124,7 @@ function PauseDialog({ focusLost, onResume, onRestart, onMainMenu }: PauseDialog
             <MenuButton onClick={onRestart}>Restart</MenuButton>
             <MenuButton onClick={onMainMenu}>Main Menu</MenuButton>
           </div>
+          <SoundToggle />
         </Panel>
       </div>
     </div>

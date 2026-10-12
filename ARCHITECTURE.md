@@ -346,6 +346,32 @@ from the same UI atlas as the game.
 - **Leaving combat** (Main Menu, or a refresh) unmounts the game view, which destroys the session:
   the match is abandoned.
 
+## Sound
+
+The match is heard through the provided WAVs, with the Web Audio API — no library.
+
+- **Cues, not sounds, in the rules** (`src/audio/cues.ts`): two pure functions turn what happened
+  into cues. `eventCues` maps a step's simulation events — bow cannon or enemy shot, broadside,
+  hit on wood, splash in open water, a ship sunk (explosion and a point) or rammed (collision) —
+  each cue **at most once per step**, so a broadside is one sound, not three. `hudCues` maps
+  changes of the HUD state — start or restart, pause, resume, health falling to a third, ten
+  seconds left (each once, as the threshold is crossed), and the end: a fanfare on time up, the
+  ship sinking and the game-over sting when it is destroyed. Both are unit-tested without audio.
+- **The engine** (`src/audio/soundEngine.ts`) turns a cue into a sound: variants take turns
+  (three cannon shots, two splashes, two explosions), each cue has its level in the mix, and two
+  loops — the sea, and the sails rising with the ship's speed — play only while the match runs.
+  Pausing, ending or leaving stops the loops; a short sound already playing finishes, so the pause
+  sting is heard.
+- **Autoplay:** browsers allow audio only after a user gesture. Nothing is created before the
+  first click or key press (`unlockSoundOnFirstGesture`), so a blocked page never sees an attempt
+  and logs nothing. The files (5.8 MB of WAV) load in the background after that gesture and never
+  hold up the game; a sound whose file has not arrived, or failed to, is simply skipped.
+- **Mute** is a master volume of zero, toggled by `M` during a match or the speaker button in the
+  HUD, the main menu and the pause dialog, and kept in `localStorage`. The atlas has no speaker
+  icon, so `public/icons/sound-on.svg` and `sound-off.svg` were drawn in its style — dark rim,
+  gold body, cream core — and sit in the same round brass button as the atlas icons.
+- The session receives the engine as an option; without it a match is silent, as in unit tests.
+
 ## Layout and orientation
 
 Both orientations are supported on a phone; the brief asks for one to be defined and for no cut-off

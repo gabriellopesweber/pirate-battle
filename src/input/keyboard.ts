@@ -20,10 +20,12 @@ export const KEY_BINDINGS: readonly KeyBinding[] = [
 
 export const PAUSE_KEYS = { codes: ['KeyP', 'Escape'], keys: 'P / Esc', label: 'Pause' } as const
 export const RESTART_KEYS = { codes: ['KeyR'], keys: 'R', label: 'Restart' } as const
+export const SOUND_KEYS = { codes: ['KeyM'], keys: 'M', label: 'Sound on / off' } as const
 
 export interface KeyboardCommands {
   onPause: () => void
   onRestart: () => void
+  onToggleSound: () => void
 }
 
 const ACTION_BY_CODE = new Map<string, Action>(
@@ -58,6 +60,11 @@ export function bindKeyboard(target: EventTarget, input: InputState, commands: K
     if ((RESTART_KEYS.codes as readonly string[]).includes(key.code)) {
       key.preventDefault()
       if (!key.repeat) commands.onRestart()
+      return
+    }
+    if ((SOUND_KEYS.codes as readonly string[]).includes(key.code)) {
+      key.preventDefault()
+      if (!key.repeat) commands.onToggleSound()
       return
     }
     const action = ACTION_BY_CODE.get(key.code)

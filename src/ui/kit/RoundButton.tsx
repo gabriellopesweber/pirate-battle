@@ -5,14 +5,26 @@ import { frameImage } from '@/ui/atlas/frameImage'
 import './kit.css'
 
 interface RoundButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children'> {
-  icon: string
+  /** An icon frame of the UI atlas… */
+  icon?: string
+  /** …or an image of its own, for icons the atlas does not have. */
+  image?: string
   /** Accessible name: the button shows only an icon. */
   label: string
   size?: number
 }
 
 /** The round atlas button with an icon, laid out as the atlas metadata says (icon at half size, centred). */
-export function RoundButton({ icon, label, size = 48, className, style, type = 'button', ...props }: RoundButtonProps) {
+export function RoundButton({
+  icon,
+  image,
+  label,
+  size = 48,
+  className,
+  style,
+  type = 'button',
+  ...props
+}: RoundButtonProps) {
   const { ui } = useAssets()
   const states: CSSProperties & Record<`--${string}`, string> = {
     '--frame-normal': `url("${frameImage(ui, 'button_round_normal')}")`,
@@ -30,7 +42,11 @@ export function RoundButton({ icon, label, size = 48, className, style, type = '
       style={{ ...states, ...style }}
       {...props}
     >
-      <AtlasSprite sheet={ui} frame={icon} width={size / 2} />
+      {image ? (
+        <img src={image} alt="" width={size / 2} height={size / 2} draggable={false} />
+      ) : (
+        icon && <AtlasSprite sheet={ui} frame={icon} width={size / 2} />
+      )}
     </button>
   )
 }
