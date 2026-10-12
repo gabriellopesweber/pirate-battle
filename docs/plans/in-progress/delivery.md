@@ -135,8 +135,11 @@ Priority is **consequence, not effort** — "what happens to the evaluation if t
 
 ## 🟢 Wave 3 — polish
 
-- [ ] **Sound** — effects and ambience loops from the provided WAVs, mute toggle. The brief makes
-  the files available but asks for no sound; done only if time allows · **#19**
+- [x] **Sound** — the provided WAVs through the Web Audio API: shots, hits, splashes,
+  explosions, score, warnings and the end, from pure cue functions (each cue once per step); the
+  sea and the sails as loops that stop on pause, end and exit; audio created only on the first
+  gesture, so a blocked page logs nothing; mute on `M` and a button, kept across refreshes. The
+  brief makes the files available without asking for sound; added as the last polish · **#19**
 
 ## Found along the way
 

@@ -1,4 +1,6 @@
 import { Application, Container, type Ticker, TilingSprite } from 'pixi.js'
+import { eventCues, hudCues } from '@/audio/cues'
+import type { SoundEngine } from '@/audio/soundEngine'
 import type { GameConfig } from '@/game/config/gameConfig'
 import { FixedStepLoop } from '@/game/core/fixedStepLoop'
 import { Match, type MatchResult, type PauseReason } from '@/game/match/match'
@@ -20,6 +22,10 @@ export interface GameSessionOptions {
   onEnd?: (result: MatchResult) => void
   /** The restart key was pressed; the owner starts a new match. */
   onRestart?: () => void
+  /** Plays the match's sounds; without it the match is silent (tests). */
+  sound?: SoundEngine
+  /** The sound key was pressed. */
+  onToggleSound?: () => void
   /**
    * Browser tests only: real time no longer advances the match, only
    * dvanceSteps does. Rendering, input and the rules run as usual.
@@ -41,6 +47,9 @@ export interface GameSessionOptions {
  */
 /** Multiplies the sea outside the arena down to a darker shade. */
 const OUTSIDE_TINT = 0x5f7f99
+/** Loop levels: the sea under everything, the sails rising with the ship's speed. */
+const OCEAN_VOLUME = 0.3
+const SAILING_VOLUME = 0.35
 
 export class GameSession {
   readonly hud: HudStore
@@ -61,6 +70,8 @@ export class GameSession {
   private stopFocusWatch: (() => void) | null = null
   private lastSize = { width: 0, height: 0 }
   private endReported = false
+  /** The HUD state the sound last reacted to; null until the first frame. */
+  private heard: HudSnapshot | null = null
   private destroyed = false
   private started = false
 
@@ -75,6 +86,7 @@ export class GameSession {
       step: (dt) => {
         this.match.step(this.input.read(), dt)
         this.scene?.handleEvents(this.match.world.events)
+        for (const cue of eventCues(this.match.world.events, this.match.world.player.id)) this.options.sound?.play(cue)
       },
     })
   }
@@ -126,6 +138,7 @@ export class GameSession {
   destroy(): void {
     if (this.destroyed) return
     this.destroyed = true
+    this.updateLoops()
     this.stopFocusWatch?.()
     this.stopFocusWatch = null
     this.releaseControls()
@@ -185,6 +198,9 @@ export class GameSession {
       onRestart: () => {
         this.options.onRestart?.()
       },
+      onToggleSound: () => {
+        this.options.onToggleSound?.()
+      },
     })
   }
 
@@ -205,6 +221,7 @@ export class GameSession {
     if (width !== this.lastSize.width || height !== this.lastSize.height) this.layout()
     this.scene?.sync(this.match.world, dt)
     this.publishHud()
+    this.updateLoops()
 
     const { result } = this.match
     if (result && !this.endReported) {
@@ -234,7 +251,22 @@ export class GameSession {
   }
 
   private publishHud(): void {
-    this.hud.publish(this.snapshot())
+    const next = this.snapshot()
+    const changed = this.hud.publish(next)
+    if (this.heard === null || changed) {
+      for (const cue of hudCues(this.heard, next)) this.options.sound?.play(cue)
+      this.heard = next
+    }
+  }
+
+  /** The sea and the sails play only while the match runs: pausing, ending or leaving stops them. */
+  private updateLoops(): void {
+    const { sound } = this.options
+    if (!sound) return
+    const running = this.match.status === 'running' && !this.destroyed
+    const { player } = this.match.world
+    sound.setLoop('ocean', running ? OCEAN_VOLUME : 0)
+    sound.setLoop('sailing', running ? (SAILING_VOLUME * player.speed) / this.options.config.player.maxSpeed : 0)
   }
 
   private snapshot(): HudSnapshot {

@@ -12,6 +12,7 @@ import { Hud } from '@/ui/game/Hud'
 import { TouchControls } from '@/ui/game/TouchControls'
 import { useHud } from '@/ui/game/useHud'
 import './GameView.css'
+import { sound, soundSetting } from '@/audio/sound'
 
 interface GameViewProps {
   config: Readonly<GameConfig>
@@ -66,6 +67,8 @@ export function GameView({ config, onEnd, onMainMenu }: GameViewProps) {
       onRestart: () => {
         latest.current.restart()
       },
+      sound,
+      onToggleSound: soundSetting.toggle,
       manualClock: testOptions.manualClock,
     })
     setSession(created)

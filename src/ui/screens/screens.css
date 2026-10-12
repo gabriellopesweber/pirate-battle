@@ -45,6 +45,18 @@
   opacity: 0.9;
 }
 
+.screen__foot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.screen__foot > .network {
+  flex: 1;
+  min-width: 0;
+}
+
 .screen__tabs {
   display: flex;
   flex-wrap: wrap;
@@ -262,7 +274,7 @@
   }
 
   .screen--menu > [role='tabpanel'],
-  .screen--menu > .network {
+  .screen--menu > .screen__foot {
     grid-column: 1 / -1;
   }
 }
@@ -286,7 +298,7 @@
     order: 2;
   }
 
-  .screen--menu > .network {
+  .screen--menu > .screen__foot {
     order: 3;
   }
 }
