@@ -1,4 +1,4 @@
-import { Application, Container, type Ticker } from 'pixi.js'
+import { Application, Container, type Ticker, TilingSprite } from 'pixi.js'
 import type { GameConfig } from '@/game/config/gameConfig'
 import { FixedStepLoop } from '@/game/core/fixedStepLoop'
 import { Match, type MatchResult, type PauseReason } from '@/game/match/match'
@@ -6,6 +6,7 @@ import { watchFocusLoss } from '@/input/autoPause'
 import { InputState } from '@/input/inputState'
 import { bindKeyboard } from '@/input/keyboard'
 import type { GameAssets } from '@/render/assets'
+import { TILE } from '@/render/frames'
 import { createHudStore, type HudSnapshot, type HudStore } from '@/render/hudStore'
 import { Scene } from '@/render/scene'
 
@@ -38,12 +39,21 @@ export interface GameSessionOptions {
  * `destroy` is idempotent and also cancels a start still in flight, which is
  * what makes React Strict Mode's mount → unmount → mount harmless.
  */
+/** Multiplies the sea outside the arena down to a darker shade. */
+const OUTSIDE_TINT = 0x5f7f99
+
 export class GameSession {
   readonly hud: HudStore
   readonly match: Match
   private readonly options: GameSessionOptions
   private readonly app = new Application()
   private readonly world = new Container({ label: 'world' })
+  /**
+   * The sea outside the arena, filling the letterbox bands (wide on a phone
+   * held upright). Darker than the arena's water, so its edge — where ships
+   * stop — stays plain to see.
+   */
+  private backdrop: TilingSprite | null = null
   readonly input: InputState
   private readonly loop: FixedStepLoop
   private stopKeyboard: (() => void) | null = null
@@ -150,6 +160,11 @@ export class GameSession {
 
     this.app.canvas.setAttribute('aria-hidden', 'true')
     container.appendChild(this.app.canvas)
+    const water = this.options.assets.tiles.textures[TILE.water]
+    if (water) {
+      this.backdrop = new TilingSprite({ texture: water, tint: OUTSIDE_TINT, label: 'outside-sea' })
+      this.app.stage.addChild(this.backdrop)
+    }
     this.scene = new Scene(this.match.world, this.options.assets)
     this.world.addChild(this.scene)
     this.app.stage.addChild(this.world)
@@ -210,6 +225,12 @@ export class GameSession {
     const scale = Math.min(width / arena.width, height / arena.height)
     this.world.scale.set(scale)
     this.world.position.set((width - arena.width * scale) / 2, (height - arena.height * scale) / 2)
+    if (this.backdrop) {
+      // Same scale and origin as the arena's water, so the pattern runs on without a seam.
+      this.backdrop.setSize(width, height)
+      this.backdrop.tileScale.set(scale)
+      this.backdrop.tilePosition.copyFrom(this.world.position)
+    }
   }
 
   private publishHud(): void {

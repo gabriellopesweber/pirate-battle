@@ -29,7 +29,7 @@ export function MainMenu({ config, playerId, onPlay, onOptions }: MainMenuProps)
   const [tab, setTab] = useState<Tab | null>(null)
 
   return (
-    <Panel className="screen">
+    <Panel className="screen screen--menu">
       <h1 className="screen__title-art">
         <AtlasSprite sheet={ui} frame="title_pirate_battle" width={260} />
         <span className="visually-hidden">Pirate Battle</span>

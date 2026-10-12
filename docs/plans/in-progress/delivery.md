@@ -178,7 +178,11 @@ item (E2E, performance) depends on the rules being deterministic.
   `ARCHITECTURE.md`. Decided 2026-10-10.
 - ❓ **Branch model** — proposed: `main` is default and production; one branch per issue; PRs
   into `main`. No `develop`, since there is no staging environment.
-- ❓ **Mobile orientation** — proposed: landscape only, with a "rotate your device" overlay.
+- ✅ **Mobile orientation** — both. Upright, the arena keeps its proportions and the bands around it
+  show a darker sea, so the edge where ships stop stays visible; the HUD wraps to two rows. On its
+  side (~400 px tall), menus switch to a compact layout so every main action shows without
+  scrolling. Chosen over landscape-only because everything but the HUD already fitted upright,
+  and an overlay would have needed pausing on rotation. Decided 2026-10-11 (#17).
 
 ## Deliberately out of scope
 

@@ -188,3 +188,79 @@
     margin: 0.35rem 0;
   }
 }
+
+/*
+ * A phone on its side (~400 px tall): every screen keeps its main actions in
+ * view without scrolling. Buttons sit side by side and shrink, the option
+ * fields share a row, and the main menu splits into two columns — actions on
+ * the left, the controls on the right; an opened score tab and the network
+ * panel follow below, where the panel scrolls.
+ */
+@media (max-height: 500px) and (orientation: landscape) {
+  .screen {
+    width: min(56rem, 100%);
+  }
+
+  .screen-title {
+    margin: 0.25rem 0;
+    font-size: 1.5rem;
+  }
+
+  .button-stack {
+    grid-auto-flow: column;
+    justify-content: center;
+    gap: 0.5rem;
+    margin: 0.4rem 0;
+  }
+
+  .menu-button {
+    width: 10rem;
+    font-size: 1rem;
+  }
+
+  .menu-button--secondary {
+    width: 9.5rem;
+    padding: 0 1rem 0.2rem;
+    font-size: 0.75rem;
+    white-space: nowrap;
+  }
+
+  .options {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* The fields share a row; the buttons and the saved note stay centred below. */
+  .options > :not(.options__field) {
+    grid-column: 1 / -1;
+  }
+
+  .result__score {
+    font-size: 2.5rem;
+  }
+
+  .result__facts {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    margin: 0.5rem 0;
+  }
+
+  .screen--menu {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    column-gap: 1.5rem;
+    align-items: center;
+  }
+
+  .screen--menu > * {
+    grid-column: 1;
+  }
+
+  .screen--menu > .screen__section {
+    grid-column: 2;
+    grid-row: 1 / span 3;
+  }
+
+  .screen--menu > [role='tabpanel'],
+  .screen--menu > .network {
+    grid-column: 1 / -1;
+  }
+}
